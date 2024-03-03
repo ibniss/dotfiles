@@ -50,6 +50,25 @@ local function split_nav(resize_or_move, key)
     }
 end
 
+local home = wezterm.home_dir
+local base_project_path = home .. '/code'
+
+-- build up a list of projects to select from
+local projects_table = {
+    -- special case for dotfiles which are not in code
+    { id = '~/dotfiles', label = 'dotfiles' },
+}
+
+-- get all folders within home/code folder
+-- split the string into a table
+local projects = io.popen('ls -d ' .. base_project_path .. '/*'):read('*a')
+for project in string.gmatch(projects, '([^\n]+)') do
+    -- remove the base path
+    local project_name = string.gsub(project, base_project_path .. '/', '')
+    -- add to table
+    table.insert(projects_table, { id = project, label = project_name })
+end
+
 --- stuff
 config.animation_fps = 180 -- match hz
 config.max_fps = 180
@@ -184,6 +203,41 @@ config.keys = {
             flags = 'FUZZY|TABS',
             title = 'Tabs',
         }),
+    },
+    -- fuzzy find workspaces per project or create new
+    {
+        key = 'f',
+        mods = 'LEADER',
+        action = wezterm.action_callback(function(window, pane)
+            window:perform_action(
+                wezterm.action.InputSelector({
+                    action = wezterm.action_callback(
+                        function(inner_window, inner_pane, id, label)
+                            if not id and not label then
+                                wezterm.log_info('No project selected')
+                            else
+                                wezterm.log_info('Selected project: ' .. id)
+                                inner_window:perform_action(
+                                    wezterm.action.SwitchToWorkspace({
+                                        name = label,
+                                        spawn = {
+                                            label = 'Workspace: ' .. label,
+                                            cwd = id,
+                                        },
+                                    }),
+                                    inner_pane
+                                )
+                            end
+                        end
+                    ),
+                    title = 'Choose Project',
+                    choices = projects_table,
+                    fuzzy = true,
+                    fuzzy_description = 'Fuzzy find and/or make a workspace for a project: ',
+                }),
+                pane
+            )
+        end),
     },
 }
 
