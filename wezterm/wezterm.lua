@@ -112,7 +112,9 @@ config.keys = {
     {
         mods = 'LEADER',
         key = '%',
-        action = wezterm.action.SplitHorizontal({ domain = 'CurrentPaneDomain' }),
+        action = wezterm.action.SplitHorizontal({
+            domain = 'CurrentPaneDomain',
+        }),
     },
 
     -- move between split panes
