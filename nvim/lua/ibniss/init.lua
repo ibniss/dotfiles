@@ -17,6 +17,5 @@ vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
     change_detection = { notify = false },
-    -- TODO: split plugins into separate files
     spec = 'ibniss.plugins',
 })
