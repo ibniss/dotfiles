@@ -1,0 +1,13 @@
+require('oil').setup({
+	default_file_explorer = true,
+	view_options = {
+		show_hidden = true,
+	},
+	use_default_keymaps = false, -- disable all keymaps
+	-- explicit keymaps
+	keymaps = {
+		["g?"] = "actions.show_help",
+		["-"] = "actions.parent",
+		["<CR>"] = "actions.select",
+	}
+})
