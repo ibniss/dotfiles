@@ -20,7 +20,21 @@ return {
         'hrsh7th/nvim-cmp',
         event = 'InsertEnter',
         dependencies = {
-            { 'L3MON4D3/LuaSnip' },
+            {
+                'L3MON4D3/LuaSnip',
+                build = (function()
+                    -- Build Step is needed for regex support in snippets
+                    -- This step is not supported in many windows environments
+                    -- Remove the below condition to re-enable on windows
+                    if
+                        vim.fn.has('win32') == 1
+                        or vim.fn.executable('make') == 0
+                    then
+                        return
+                    end
+                    return 'make install_jsregexp'
+                end)(),
+            },
             { 'hrsh7th/cmp-buffer' }, -- Optional
             { 'hrsh7th/cmp-path' }, -- Optional
             { 'saadparwaiz1/cmp_luasnip' }, -- Optional
@@ -29,18 +43,29 @@ return {
         config = function()
             -- Here is where you configure the autocompletion settings.
             local lsp_zero = require('lsp-zero')
+            local luasnip = require('luasnip')
             lsp_zero.extend_cmp()
 
             -- And you can configure cmp even more, if you want to.
             local cmp = require('cmp')
             local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
+            vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+
             cmp.setup({
+                snippet = {
+                    expand = function(args)
+                        luasnip.lsp_expand(args.body)
+                    end,
+                },
+                preselect = 'item', -- Automatically select the first item
+                completion = {
+                    completeopt = 'menu,menuone,noinsert',
+                },
                 sources = {
                     { name = 'path' },
                     { name = 'nvim_lsp' },
                     { name = 'nvim_lua' },
-                    { name = 'luasnip', keyword_length = 2 },
                     { name = 'buffer', keyword_length = 3 },
                 },
                 formatting = lsp_zero.cmp_format({ details = false }),
@@ -50,10 +75,23 @@ return {
                     ['<C-y>'] = cmp.mapping.confirm({ select = true }),
                     ['<C-e>'] = lsp_zero.cmp_action().toggle_completion(),
                     ['<C-Space>'] = cmp.mapping.complete(),
+                    -- <c-l> will move you to the right of each of the expansion locations.
+                    -- <c-h> is similar, except moving you backwards.
+                    ['<C-l>'] = cmp.mapping(function()
+                        if luasnip.expand_or_locally_jumpable() then
+                            luasnip.expand_or_jump()
+                        end
+                    end, { 'i', 's' }),
+                    ['<C-h>'] = cmp.mapping(function()
+                        if luasnip.locally_jumpable(-1) then
+                            luasnip.jump(-1)
+                        end
+                    end, { 'i', 's' }),
                 }),
                 -- add border to the completion window
                 window = {
                     documentation = cmp.config.window.bordered(),
+                    completion = cmp.config.window.bordered(),
                 },
             })
         end,
