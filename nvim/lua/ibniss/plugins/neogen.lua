@@ -9,6 +9,13 @@ return {
 
         neogen.setup({
             snippet_engine = 'luasnip',
+            languages = {
+                python = {
+                    template = {
+                        annotation_convention = 'reST',
+                    },
+                },
+            },
         })
 
         vim.keymap.set('n', '<leader>nf', function() neogen.generate() end)
