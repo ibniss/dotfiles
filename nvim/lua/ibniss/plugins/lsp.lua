@@ -1,71 +1,83 @@
 return {
     {
         'VonHeikemen/lsp-zero.nvim',
-        branch = 'v1.x',
+        branch = 'v3.x',
+        lazy = true,
+        config = false,
+        init = function()
+            -- Disable automatic setup, we are doing it manually
+            vim.g.lsp_zero_extend_cmp = 0
+            vim.g.lsp_zero_extend_lspconfig = 0
+        end,
+    },
+    {
+        'williamboman/mason.nvim',
+        lazy = false,
+        config = true,
+    },
+    -- Autocompletion
+    {
+        'hrsh7th/nvim-cmp',
+        event = 'InsertEnter',
         dependencies = {
-            -- LSP Support
-            { 'neovim/nvim-lspconfig' }, -- Required
-            { 'williamboman/mason.nvim' }, -- Optional
-            { 'williamboman/mason-lspconfig.nvim' }, -- Optional
-
-            -- Autocompletion
-            { 'hrsh7th/nvim-cmp' }, -- Required
-            { 'hrsh7th/cmp-nvim-lsp' }, -- Required
+            { 'L3MON4D3/LuaSnip' },
             { 'hrsh7th/cmp-buffer' }, -- Optional
             { 'hrsh7th/cmp-path' }, -- Optional
             { 'saadparwaiz1/cmp_luasnip' }, -- Optional
             { 'hrsh7th/cmp-nvim-lua' }, -- Optional
-
-            -- Snippets
-            { 'L3MON4D3/LuaSnip' }, -- Required
         },
         config = function()
+            -- Here is where you configure the autocompletion settings.
             local lsp_zero = require('lsp-zero')
+            lsp_zero.extend_cmp()
 
-            lsp_zero.preset('recommended')
-
-            lsp_zero.ensure_installed({
-                'tsserver',
-                'eslint',
-                'lua_ls',
-                'rust_analyzer',
-                'pyright',
-            })
-
-            lsp_zero.nvim_workspace()
-
+            -- And you can configure cmp even more, if you want to.
             local cmp = require('cmp')
             local cmp_select = { behavior = cmp.SelectBehavior.Select }
-            local cmp_mappings = lsp_zero.defaults.cmp_mappings({
-                --- Prev/Next
-                ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-                ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-                --- Accept
-                ['<C-y>'] = cmp.mapping.confirm({ select = true }),
-                --- Start completion
-                ['<C-Space>'] = cmp.mapping.complete(),
+
+            cmp.setup({
+                sources = {
+                    { name = 'path' },
+                    { name = 'nvim_lsp' },
+                    { name = 'nvim_lua' },
+                    { name = 'luasnip', keyword_length = 2 },
+                    { name = 'buffer', keyword_length = 3 },
+                },
+                formatting = lsp_zero.cmp_format({ details = false }),
+                mapping = cmp.mapping.preset.insert({
+                    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+                    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+                    ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+                    ['<C-e>'] = lsp_zero.cmp_action().toggle_completion(),
+                    ['<C-Space>'] = cmp.mapping.complete(),
+                }),
+                -- add border to the completion window
+                window = {
+                    documentation = cmp.config.window.bordered(),
+                },
             })
+        end,
+    },
+    -- LSP
+    {
+        'neovim/nvim-lspconfig',
+        cmd = { 'LspInfo', 'LspInstall', 'LspStart' },
+        event = { 'BufReadPre', 'BufNewFile' },
+        dependencies = {
+            { 'hrsh7th/cmp-nvim-lsp' },
+            { 'williamboman/mason-lspconfig.nvim' },
+        },
+        config = function()
+            -- This is where all the LSP shenanigans will live
+            local lsp_zero = require('lsp-zero')
+            lsp_zero.extend_lspconfig()
 
-            --- remove tab and shift-tab mappings
-            cmp_mappings['<Tab>'] = nil
-            cmp_mappings['<S-Tab>'] = nil
-
-            lsp_zero.setup_nvim_cmp({
-                mapping = cmp_mappings,
-            })
-
-            --- Show icons in gutter
-            lsp_zero.set_sign_icons({
-                error = '✘',
-                warn = '▲',
-                hint = '⚑',
-                info = '»',
-            })
-
-            --- when any LSP is attached apply these
+            --- if you want to know more about lsp-zero and mason.nvim
+            --- read this: https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/guides/integrate-with-mason-nvim.md
             lsp_zero.on_attach(function(client, bufnr)
+                -- see :help lsp-zero-keybindings
+                -- to learn the available actions
                 local opts = { buffer = bufnr, remap = false }
-
                 vim.keymap.set('n', 'gd', function()
                     vim.lsp.buf.definition()
                 end, opts)
@@ -100,10 +112,41 @@ return {
                 end, opts)
             end)
 
-            lsp_zero.setup()
+            require('mason-lspconfig').setup({
+                ensure_installed = {
+                    'tsserver',
+                    'eslint',
+                    'lua_ls',
+                    'rust_analyzer',
+                    'pyright',
+                },
+                handlers = {
+                    lsp_zero.default_setup,
+                    lua_ls = function()
+                        -- (Optional) Configure lua language server for neovim
+                        local lua_opts = lsp_zero.nvim_lua_ls()
+                        require('lspconfig').lua_ls.setup(lua_opts)
+                    end,
+                },
+            })
+
+            lsp_zero.set_sign_icons({
+                error = '✘',
+                warn = '▲',
+                hint = '⚑',
+                info = '',
+            })
 
             vim.diagnostic.config({
                 virtual_text = true,
+                severity_sort = true,
+                float = {
+                    style = 'minimal',
+                    border = 'rounded',
+                    source = 'always',
+                    header = '',
+                    prefix = '',
+                },
             })
         end,
     },
