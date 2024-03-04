@@ -16,6 +16,9 @@ local function is_vim(pane)
     return pane:get_user_vars().IS_NVIM == 'true'
 end
 
+--- Create a split-nav keybinding
+---@param resize_or_move 'resize' | 'move' Resize or move the pane
+---@param key 'h'|'j'|'k'|'l' HJKL key
 local function split_nav(resize_or_move, key)
     local adjusted_key = resize_or_move == 'move' and key
         or direction_keys[key] .. 'Arrow'
@@ -210,16 +213,12 @@ end
 -- VISUAL
 --
 local function get_appearance()
-    if wezterm.gui then
-        return wezterm.gui.get_appearance()
-    end
+    if wezterm.gui then return wezterm.gui.get_appearance() end
     return 'Dark'
 end
 
 local function scheme_for_appearance(appearance)
-    if appearance:find('Dark') then
-        return 'rose-pine-moon'
-    end
+    if appearance:find('Dark') then return 'rose-pine-moon' end
 
     return 'rose-pine-dawn'
 end
@@ -277,8 +276,6 @@ end
 
 -- keep status bar up to date (polls every few seconds)
 wezterm.on('update-right-status', function(window, pane)
-    window:set_right_status('󰉖 ' .. window:active_workspace())
-
     local appearance = get_appearance()
 
     local overrides = window:get_config_overrides() or {}
@@ -287,6 +284,17 @@ wezterm.on('update-right-status', function(window, pane)
         tab_bar = get_tab_colors(appearance:find('Dark')),
     }
     window:set_config_overrides(overrides)
+
+    local theme_colors = appearance:find('Dark') and rose_moon_colors
+        or rose_dawn_colors
+
+    -- TODO: format
+    window:set_right_status('󰉖 ' .. window:active_workspace())
+    -- window:set_right_status(wezterm.format(
+    --     { Text = '󰉖 ' .. window:active_workspace() }
+    --     -- { Background = { Color = theme_colors.base } },
+    --     -- { Foreground = { Color = theme_colors.text } }
+    -- ))
 end)
 
 config.window_padding = {

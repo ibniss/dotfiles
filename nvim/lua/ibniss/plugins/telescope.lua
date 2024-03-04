@@ -32,11 +32,19 @@ return {
         --- Project Search
         vim.keymap.set('n', '<leader>ps', builtin.live_grep, {})
         -- word search under cursor
-        vim.keymap.set('n', '<leader>pws', function()
-            builtin.grep_string({ search = vim.fn.expand('<cword>') })
-        end)
-        vim.keymap.set('n', '<leader>pWs', function()
-            builtin.grep_string({ search = vim.fn.expand('<cWORD>') })
-        end)
+        vim.keymap.set(
+            'n',
+            '<leader>pws',
+            function()
+                builtin.grep_string({ search = vim.fn.expand('<cword>') })
+            end
+        )
+        vim.keymap.set(
+            'n',
+            '<leader>pWs',
+            function()
+                builtin.grep_string({ search = vim.fn.expand('<cWORD>') })
+            end
+        )
     end,
 }

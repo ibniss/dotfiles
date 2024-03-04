@@ -3,12 +3,12 @@ return {
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
         require('lualine').setup({
-            theme = 'palenight',
+            theme = 'onedark',
             sections = {
                 lualine_a = { 'mode' },
                 lualine_b = { '%{FugitiveStatusline()}', 'diff', 'diagnostics' },
                 lualine_c = { 'filename' },
-                lualine_x = { 'fileformat', 'filetype' },
+                lualine_x = { 'filetype' },
                 lualine_y = { 'progress' },
                 lualine_z = { 'location' },
             },
