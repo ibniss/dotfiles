@@ -74,49 +74,6 @@ config.animation_fps = 180 -- match hz
 config.max_fps = 180
 
 -- This is where you actually apply your config choices
-config.audible_bell = 'Disabled'
-config.color_scheme = 'rose-pine-moon'
-config.window_decorations = 'RESIZE'
-
--- colors from rose-pine-moon
-config.colors = {
-    tab_bar = {
-        background = '#232136',
-        active_tab = {
-            bg_color = '#56526e',
-            fg_color = '#e0def4',
-            intensity = 'Bold',
-        },
-        inactive_tab = {
-            bg_color = '#2a283e',
-            fg_color = '#e0def4',
-        },
-        inactive_tab_hover = {
-            bg_color = '#44415a',
-            fg_color = '#e0def4',
-            italic = true,
-        },
-        new_tab = {
-            bg_color = '#2a283e',
-            fg_color = '#e0def4',
-        },
-        new_tab_hover = {
-            bg_color = '#44415a',
-            fg_color = '#e0def4',
-            italic = true,
-        },
-    },
-}
-
-config.window_padding = {
-    top = '0.5cell',
-    bottom = '0.0cell',
-}
-
--- setup stuff to behave like tmux
-config.enable_tab_bar = true
-config.tab_bar_at_bottom = true
-config.use_fancy_tab_bar = false -- look like native
 
 -- Make Ctrl+A the leader key
 config.leader = { key = 'a', mods = 'CTRL', timeout_milliseconds = 1000 }
@@ -241,11 +198,6 @@ config.keys = {
     },
 }
 
--- updates status bar to show current workspace
-wezterm.on('update-right-status', function(window, pane)
-    window:set_right_status('󰉖 ' .. window:active_workspace())
-end)
-
 -- leader+number to switch tabs
 for i = 1, 9 do
     table.insert(config.keys, {
@@ -254,6 +206,98 @@ for i = 1, 9 do
         action = wezterm.action.ActivateTab(i - 1),
     })
 end
+
+-- VISUAL
+--
+local function get_appearance()
+    if wezterm.gui then
+        return wezterm.gui.get_appearance()
+    end
+    return 'Dark'
+end
+
+local function scheme_for_appearance(appearance)
+    if appearance:find('Dark') then
+        return 'rose-pine-moon'
+    end
+
+    return 'rose-pine-dawn'
+end
+
+config.audible_bell = 'Disabled'
+config.color_scheme = 'rose-pine-moon'
+config.window_decorations = 'RESIZE'
+
+local rose_moon_colors = {
+    base = '#232136',
+    text = '#e0def4',
+    highlight_low = '#2a283e',
+    highlight_med = '#44415a',
+    highlight_high = '#56526e',
+}
+
+local rose_dawn_colors = {
+    base = '#faf4ed',
+    text = '#575279',
+    highlight_low = '#f4e3d9',
+    highlight_med = '#dfdad9',
+    highlight_high = '#cecacd',
+}
+
+local function get_tab_colors(is_dark)
+    local theme_colors = is_dark and rose_moon_colors or rose_dawn_colors
+
+    return {
+        background = theme_colors.base,
+        active_tab = {
+            bg_color = theme_colors.highlight_high,
+            fg_color = theme_colors.text,
+            intensity = 'Bold',
+        },
+        inactive_tab = {
+            bg_color = theme_colors.highlight_low,
+            fg_color = theme_colors.text,
+        },
+        inactive_tab_hover = {
+            bg_color = theme_colors.highlight_med,
+            fg_color = theme_colors.text,
+            italic = true,
+        },
+        new_tab = {
+            bg_color = theme_colors.highlight_low,
+            fg_color = theme_colors.text,
+        },
+        new_tab_hover = {
+            bg_color = theme_colors.highlight_med,
+            fg_color = theme_colors.text,
+            italic = true,
+        },
+    }
+end
+
+-- keep status bar up to date (polls every few seconds)
+wezterm.on('update-right-status', function(window, pane)
+    window:set_right_status('󰉖 ' .. window:active_workspace())
+
+    local appearance = get_appearance()
+
+    local overrides = window:get_config_overrides() or {}
+    overrides.color_scheme = scheme_for_appearance(appearance)
+    overrides.colors = {
+        tab_bar = get_tab_colors(appearance:find('Dark')),
+    }
+    window:set_config_overrides(overrides)
+end)
+
+config.window_padding = {
+    top = '0.5cell',
+    bottom = '0.0cell',
+}
+
+-- setup stuff to behave like tmux
+config.enable_tab_bar = true
+config.tab_bar_at_bottom = true
+config.use_fancy_tab_bar = false -- look like native
 
 -- Font
 config.font = wezterm.font({
