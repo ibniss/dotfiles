@@ -226,6 +226,7 @@ end
 config.audible_bell = 'Disabled'
 config.color_scheme = 'rose-pine-moon'
 config.window_decorations = 'RESIZE'
+config.native_macos_fullscreen_mode = true
 
 local rose_moon_colors = {
     base = '#232136',
@@ -288,10 +289,13 @@ wezterm.on('update-right-status', function(window, pane)
     local theme_colors = appearance:find('Dark') and rose_moon_colors
         or rose_dawn_colors
 
+    local date = wezterm.strftime('%H:%M')
+
     window:set_right_status(wezterm.format({
         { Attribute = { Intensity = 'Bold' } },
         { Background = { Color = theme_colors.base } },
         { Foreground = { Color = theme_colors.text } },
+        { Text = date .. '  ' },
         { Text = '󰉖 ' .. window:active_workspace() },
     }))
 end)
@@ -321,7 +325,8 @@ config.font = wezterm.font({
     },
 })
 
-config.font_size = 18
+config.font_size = 16
+config.line_height = 1.2
 
 -- keys
 config.send_composed_key_when_left_alt_is_pressed = true
