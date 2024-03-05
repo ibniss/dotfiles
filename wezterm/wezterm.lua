@@ -288,13 +288,12 @@ wezterm.on('update-right-status', function(window, pane)
     local theme_colors = appearance:find('Dark') and rose_moon_colors
         or rose_dawn_colors
 
-    -- TODO: format
-    window:set_right_status('󰉖 ' .. window:active_workspace())
-    -- window:set_right_status(wezterm.format(
-    --     { Text = '󰉖 ' .. window:active_workspace() }
-    --     -- { Background = { Color = theme_colors.base } },
-    --     -- { Foreground = { Color = theme_colors.text } }
-    -- ))
+    window:set_right_status(wezterm.format({
+        { Attribute = { Intensity = 'Bold' } },
+        { Background = { Color = theme_colors.base } },
+        { Foreground = { Color = theme_colors.text } },
+        { Text = '󰉖 ' .. window:active_workspace() },
+    }))
 end)
 
 config.window_padding = {

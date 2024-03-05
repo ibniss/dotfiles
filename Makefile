@@ -4,4 +4,4 @@ link-nvim:
 
 link-wezterm:
 	rm ~/.wezterm.lua
-	ln -s $(PWD)/wezterm/wezterm.lua ~/.wezterm.lua
+	ln -s $(PWD)/wezterm ~/.config/wezterm
