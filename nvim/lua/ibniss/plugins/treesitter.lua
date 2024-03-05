@@ -12,6 +12,8 @@ return {
                     'python',
                     'rust',
                     'c',
+                    'css',
+                    'html',
                     'lua',
                     'vim',
                     'vimdoc',
