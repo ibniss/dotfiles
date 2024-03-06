@@ -9,7 +9,7 @@ return {
             variant = 'dawn',
             dark_variant = 'moon',
             styles = {
-                transparency = true, --- let terminal dictate background colors, not the theme
+                transparency = false,
             },
         })
 
