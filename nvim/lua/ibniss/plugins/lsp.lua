@@ -102,6 +102,8 @@ return {
         dependencies = {
             { 'hrsh7th/cmp-nvim-lsp' },
             { 'williamboman/mason-lspconfig.nvim' },
+            -- configures LSP to work for nvim/vim APIs
+            { 'folke/neodev.nvim', opts = {} },
         },
         config = function()
             -- This is where all the LSP shenanigans will live
@@ -139,7 +141,13 @@ return {
                     opts
                 )
                 vim.keymap.set('n', '<leader>vrr', vim.lsp.buf.references, opts)
-                vim.keymap.set('n', '<leader>vrn', vim.lsp.buf.rename, opts)
+                -- like vim.lsp.buf.rename but with incremental rename
+                vim.keymap.set(
+                    'n',
+                    '<leader>vrn',
+                    function() return ':IncRename ' .. vim.fn.expand('<cword>') end,
+                    { expr = true }
+                )
 
                 --- Insert mode - C-H to show signature
                 vim.keymap.set('i', '<C-h>', vim.lsp.buf.signature_help, opts)
