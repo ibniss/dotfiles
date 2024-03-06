@@ -31,6 +31,14 @@ return {
         vim.keymap.set('n', '<C-p>', builtin.git_files, {})
         --- Project Search
         vim.keymap.set('n', '<leader>ps', builtin.live_grep, {})
+        --- View Workspace Symbols / Document Symbols
+        vim.keymap.set(
+            'n',
+            '<leader>vws',
+            builtin.lsp_dynamic_workspace_symbols,
+            {}
+        )
+        vim.keymap.set('n', '<leader>vds', builtin.lsp_document_symbols, {})
         -- word search under cursor
         vim.keymap.set(
             'n',
