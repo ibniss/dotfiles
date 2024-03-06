@@ -55,9 +55,7 @@ return {
     },
     {
         'nvim-treesitter/nvim-treesitter-context',
-        opts = {
-            separator = '-',
-        },
+        opts = {},
     },
     {
         'nvim-treesitter/nvim-treesitter-textobjects',

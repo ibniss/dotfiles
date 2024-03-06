@@ -15,15 +15,6 @@ return {
         lazy = false,
         config = true,
     },
-    -- status updates for LSPs
-    {
-        'j-hui/fidget.nvim',
-        opts = {
-            notification = {
-                window = { winblend = 0 },
-            },
-        },
-    },
     -- Autocompletion
     {
         'hrsh7th/nvim-cmp',
