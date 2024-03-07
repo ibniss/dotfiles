@@ -76,6 +76,9 @@ end
 config.animation_fps = 180 -- match hz
 config.max_fps = 180
 
+--- tells nvim and others about the terminal capabilities
+config.term = 'wezterm'
+
 -- This is where you actually apply your config choices
 
 -- Make Ctrl+A the leader key

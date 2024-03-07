@@ -34,7 +34,19 @@ return {
                     { LualineUtil.pretty_path() },
                 },
 
-                lualine_x = { 'diff' },
+                lualine_x = {
+                    {
+                        function()
+                            return require('noice').api.status.command.get()
+                        end,
+                        cond = function()
+                            return package.loaded['noice']
+                                and require('noice').api.status.command.has()
+                        end,
+                        color = 'Statement',
+                    },
+                    { 'diff' },
+                },
                 lualine_y = {
                     {
                         'progress',

@@ -102,7 +102,6 @@ return {
         dependencies = {
             { 'hrsh7th/cmp-nvim-lsp' },
             { 'williamboman/mason-lspconfig.nvim' },
-            -- configures LSP to work for nvim/vim APIs
             { 'folke/neodev.nvim', opts = {} },
         },
         config = function()
@@ -123,7 +122,7 @@ return {
 
                 vim.keymap.set(
                     'n',
-                    '<leader>vd',
+                    '<leader>e',
                     vim.diagnostic.open_float,
                     opts
                 )
@@ -133,7 +132,6 @@ return {
                     vim.diagnostic.setloclist,
                     opts
                 )
-
                 vim.keymap.set(
                     'n',
                     '<leader>vca',
@@ -141,7 +139,7 @@ return {
                     opts
                 )
                 vim.keymap.set('n', '<leader>vrr', vim.lsp.buf.references, opts)
-                -- like vim.lsp.buf.rename but with incremental rename
+                -- vim.keymap.set('n', '<leader>vrn', vim.lsp.buf.rename, opts)
                 vim.keymap.set(
                     'n',
                     '<leader>vrn',
@@ -180,6 +178,7 @@ return {
 
             vim.diagnostic.config({
                 virtual_text = true,
+                underline = true,
                 severity_sort = true,
                 float = {
                     style = 'minimal',
