@@ -18,8 +18,6 @@ function M.pretty_path(opts)
 
         if opts.relative == 'cwd' and path:find(cwd, 1, true) == 1 then
             path = path:sub(#cwd + 2)
-        else
-            path = path:sub(#root + 2)
         end
 
         local sep = package.config:sub(1, 1)

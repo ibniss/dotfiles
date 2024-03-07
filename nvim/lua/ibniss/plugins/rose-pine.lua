@@ -6,10 +6,9 @@ return {
     config = function()
         require('rose-pine').setup({
             --- light/dark mode variants based on vim.o.background
-            variant = 'dawn',
             dark_variant = 'moon',
             styles = {
-                transparency = false,
+                transparency = true,
             },
         })
 

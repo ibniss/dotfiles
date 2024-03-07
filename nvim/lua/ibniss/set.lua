@@ -28,4 +28,5 @@ vim.opt.updatetime = 50
 
 --- extra
 vim.opt.showmode = false --- don't show mode as we have a statusline
-vim.opt.cursorline = false
+vim.opt.cursorline = true
+vim.opt.cursorlineopt = 'number'
