@@ -51,7 +51,7 @@ return {
                     {
                         'progress',
                         separator = ' ',
-                        padding = { left = 1, right = 0 },
+                        padding = { left = 1, right = 1 },
                     },
                 },
                 lualine_z = { 'location' },
