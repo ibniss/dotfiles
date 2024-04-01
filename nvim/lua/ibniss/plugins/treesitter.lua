@@ -3,6 +3,11 @@ return {
         'nvim-treesitter/nvim-treesitter',
         build = ':TSUpdate',
         config = function()
+            vim.filetype.add({
+                extension = {
+                    mdx = 'mdx',
+                },
+            })
             require('nvim-treesitter.configs').setup({
                 -- A list of parser names, or "all" (the five listed parsers should always be installed)
                 ensure_installed = {
@@ -25,6 +30,9 @@ return {
                 },
                 ignore_install = {},
                 modules = {},
+                filetype_to_parsername = {
+                    mdx = 'markdown',
+                },
 
                 -- Install parsers synchronously (only applied to `ensure_installed`)
                 sync_install = false,
