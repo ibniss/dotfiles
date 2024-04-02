@@ -39,6 +39,8 @@ return {
             { 'hrsh7th/cmp-path' }, -- Optional
             { 'saadparwaiz1/cmp_luasnip' }, -- Optional
             { 'hrsh7th/cmp-nvim-lua' }, -- Optional
+            -- icons for completion items
+            { 'onsails/lspkind.nvim' },
         },
         config = function()
             -- Here is where you configure the autocompletion settings.
@@ -51,6 +53,8 @@ return {
             local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
             vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+
+            local lspkind = require('lspkind')
 
             cmp.setup({
                 snippet = {
@@ -66,7 +70,21 @@ return {
                     { name = 'nvim_lua' },
                     { name = 'buffer', keyword_length = 3 },
                 },
-                formatting = lsp_zero.cmp_format({ details = false }),
+                -- formatting = lsp_zero.cmp_format({ details = false }),
+                formatting = {
+                    expandable_indicator = true,
+                    fields = {
+                        'kind',
+                        'abbr',
+                        'menu',
+                    },
+                    format = lspkind.cmp_format({
+                        mode = 'symbol',
+                        ellipsis_char = '...',
+                        show_labelDetails = true,
+                        preset = 'codicons', -- uses vscode codicons
+                    }),
+                },
                 mapping = cmp.mapping.preset.insert({
                     ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
                     ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
