@@ -157,7 +157,6 @@ return {
                     opts
                 )
                 vim.keymap.set('n', '<leader>vrr', vim.lsp.buf.references, opts)
-                -- vim.keymap.set('n', '<leader>vrn', vim.lsp.buf.rename, opts)
                 vim.keymap.set(
                     'n',
                     '<leader>vrn',
