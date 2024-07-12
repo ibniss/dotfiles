@@ -6,6 +6,7 @@ return {
             'nvim-telescope/telescope.nvim',
             'mfussenegger/nvim-dap-python',
         },
+        branch = 'regexp', -- new version
         opts = {
             -- Your options go here
             name = '.venv',
