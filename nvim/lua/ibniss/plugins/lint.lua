@@ -53,6 +53,8 @@ return {
                     )
             end, names)
 
+            -- print('names' .. vim.inspect(names))
+
             -- Run linters.
             if #names > 0 then lint.try_lint(names) end
         end
@@ -62,6 +64,6 @@ return {
             callback = M.debounce(100, M.lint),
         })
 
-        vim.keymap.set('n', '<leader>l', function() M.lint() end)
+        vim.keymap.set('n', '<leader>l', M.lint)
     end,
 }
