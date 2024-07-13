@@ -30,3 +30,6 @@ vim.opt.updatetime = 50
 vim.opt.showmode = false --- don't show mode as we have a statusline
 vim.opt.cursorline = true
 vim.opt.cursorlineopt = 'number'
+
+-- fold stuff
+require('ibniss.util.foldtext').setup()
