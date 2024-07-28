@@ -1,0 +1,27 @@
+# Lines configured by zsh-newuser-install
+HISTFILE=~/.histfile
+HISTSIZE=1000
+SAVEHIST=1000
+bindkey -e
+# End of lines configured by zsh-newuser-install
+# The following lines were added by compinstall
+zstyle :compinstall filename '/home/ibniss/.zshrc'
+
+source ~/.config/wezterm/wezterm.sh
+
+# Explicitly set Delete key in term
+typeset -g -A key
+key[Delete]="${terminfo[kdch1]}"
+[[ -n "${key[Delete]}"    ]] && bindkey -- "${key[Delete]}"     delete-char
+
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
+
+# Paths
+export PATH="$PATH:/opt/nvim/"
+export PATH="$PATH:/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin"
+
+eval "$(starship init zsh)"
+eval "$(/home/ibniss/.local/bin/mise activate zsh)"
+eval "$(~/.local/bin/mise activate zsh)"
