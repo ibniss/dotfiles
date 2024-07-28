@@ -58,8 +58,6 @@ local base_project_path = home .. '/code'
 
 -- build up a list of projects to select from
 local projects_table = {
-    -- special case for dotfiles which are not in code
-    { id = '~/dotfiles', label = 'dotfiles' },
 }
 
 -- get all folders within home/code folder
@@ -87,12 +85,12 @@ config.leader = { key = 'a', mods = 'CTRL', timeout_milliseconds = 1000 }
 config.keys = {
     -- splitting
     {
-        mods = 'LEADER',
+        mods = 'LEADER | SHIFT',
         key = '"',
         action = wezterm.action.SplitVertical({ domain = 'CurrentPaneDomain' }),
     },
     {
-        mods = 'LEADER',
+        mods = 'LEADER | SHIFT',
         key = '%',
         action = wezterm.action.SplitHorizontal({
             domain = 'CurrentPaneDomain',
