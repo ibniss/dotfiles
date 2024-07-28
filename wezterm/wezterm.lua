@@ -328,8 +328,8 @@ config.font = wezterm.font({
     },
 })
 
-config.font_size = 16
-config.line_height = 1.2
+config.font_size = 14
+config.line_height = 1
 
 -- keys
 config.send_composed_key_when_left_alt_is_pressed = true
