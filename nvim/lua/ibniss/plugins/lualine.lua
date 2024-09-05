@@ -19,7 +19,13 @@ return {
             theme = 'auto',
             sections = {
                 lualine_a = { 'mode' },
-                lualine_b = { '%{FugitiveStatusline()}' },
+                lualine_b = {
+                    function()
+                        local icon = require('nvim-web-devicons').get_icon('git')
+                        local git = require("neogit.lib.git")
+                        return icon .. ' ' .. git.repo.state.head.branch
+                    end,
+                },
                 lualine_c = {
                     LualineUtil.root_dir(),
                     {
