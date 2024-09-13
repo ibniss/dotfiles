@@ -58,6 +58,8 @@ local base_project_path = home .. '/code'
 
 -- build up a list of projects to select from
 local projects_table = {
+     -- special case for dotfiles which are not in code
+    { id = '~/dotfiles', label = 'dotfiles' },
 }
 
 -- get all folders within home/code folder
@@ -219,62 +221,15 @@ local function get_appearance()
 end
 
 local function scheme_for_appearance(appearance)
-    if appearance:find('Dark') then return 'rose-pine-moon' end
+    if appearance:find('Dark') then return 'tokyonight_moon' end
 
-    return 'rose-pine-dawn'
+    return 'tokyonight_day'
 end
 
 config.audible_bell = 'Disabled'
-config.color_scheme = 'rose-pine-moon'
+config.color_scheme = 'tokyonight_day'
 config.window_decorations = 'RESIZE'
 config.native_macos_fullscreen_mode = true
-
-local rose_moon_colors = {
-    base = '#232136',
-    text = '#e0def4',
-    highlight_low = '#2a283e',
-    highlight_med = '#44415a',
-    highlight_high = '#56526e',
-}
-
-local rose_dawn_colors = {
-    base = '#faf4ed',
-    text = '#575279',
-    highlight_low = '#f4e3d9',
-    highlight_med = '#dfdad9',
-    highlight_high = '#cecacd',
-}
-
-local function get_tab_colors(is_dark)
-    local theme_colors = is_dark and rose_moon_colors or rose_dawn_colors
-
-    return {
-        background = theme_colors.base,
-        active_tab = {
-            bg_color = theme_colors.highlight_high,
-            fg_color = theme_colors.text,
-            intensity = 'Bold',
-        },
-        inactive_tab = {
-            bg_color = theme_colors.highlight_low,
-            fg_color = theme_colors.text,
-        },
-        inactive_tab_hover = {
-            bg_color = theme_colors.highlight_med,
-            fg_color = theme_colors.text,
-            italic = true,
-        },
-        new_tab = {
-            bg_color = theme_colors.highlight_low,
-            fg_color = theme_colors.text,
-        },
-        new_tab_hover = {
-            bg_color = theme_colors.highlight_med,
-            fg_color = theme_colors.text,
-            italic = true,
-        },
-    }
-end
 
 -- keep status bar up to date (polls every few seconds)
 wezterm.on('update-right-status', function(window, pane)
@@ -282,20 +237,15 @@ wezterm.on('update-right-status', function(window, pane)
 
     local overrides = window:get_config_overrides() or {}
     overrides.color_scheme = scheme_for_appearance(appearance)
-    overrides.colors = {
-        tab_bar = get_tab_colors(appearance:find('Dark')),
-    }
     window:set_config_overrides(overrides)
 
-    local theme_colors = appearance:find('Dark') and rose_moon_colors
-        or rose_dawn_colors
-
+    local theme_colors = wezterm.get_builtin_color_schemes()[appearance:find('Dark') and 'tokyonight_moon' or 'tokyonight_day']
     local date = wezterm.strftime('%H:%M')
 
     window:set_right_status(wezterm.format({
         { Attribute = { Intensity = 'Bold' } },
-        { Background = { Color = theme_colors.base } },
-        { Foreground = { Color = theme_colors.text } },
+        { Background = { Color = theme_colors.background } },
+        { Foreground = { Color = theme_colors.foreground } },
         { Text = date .. '  ' },
         { Text = '󰉖 ' .. window:active_workspace() },
     }))
@@ -326,8 +276,13 @@ config.font = wezterm.font({
     },
 })
 
-config.font_size = 14
-config.line_height = 1
+-- Linux conf
+-- config.font_size = 14
+-- config.line_height = 1
+
+-- macOS conf
+config.font_size = 16
+config.line_height = 1.2
 
 -- keys
 config.send_composed_key_when_left_alt_is_pressed = true

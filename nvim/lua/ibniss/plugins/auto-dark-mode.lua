@@ -1,6 +1,8 @@
-local function update_notify_color()
-    local palette = require('rose-pine.palette') -- this imports light/dark based on vim.o.background
-    vim.cmd([[ hi NotifyBackground guibg = ]] .. palette.base)
+local function update_notify_color(color)
+    local palette = require('tokyonight.colors').setup({
+        style = color == 'dark' and 'moon' or 'day',
+    }) -- this imports light/dark based on vim.o.background
+    vim.cmd([[ hi NotifyBackground guibg = ]] .. palette.bg)
 end
 
 return {
@@ -9,13 +11,11 @@ return {
         update_interval = 3000,
         set_dark_mode = function()
             vim.o.background = 'dark'
-            vim.cmd('colorscheme rose-pine-moon')
-
-            update_notify_color()
+            update_notify_color('dark')
         end,
         set_light_mode = function()
             vim.o.background = 'light'
-            vim.cmd('colorscheme rose-pine-dawn')
+            update_notify_color('light')
         end,
     },
 }

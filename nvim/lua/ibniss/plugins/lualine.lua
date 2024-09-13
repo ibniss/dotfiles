@@ -16,14 +16,25 @@ return {
     end,
     config = function()
         require('lualine').setup({
-            theme = 'auto',
+            theme = 'tokyonight',
             sections = {
                 lualine_a = { 'mode' },
                 lualine_b = {
                     function()
                         local icon = require('nvim-web-devicons').get_icon('git')
                         local git = require("neogit.lib.git")
-                        return icon .. ' ' .. git.repo.state.head.branch
+                        local branch = git.repo.state.head.branch
+
+                        if not branch then
+                            return ''
+                        end
+
+                        -- truncate branch name if it's too long
+                        if #branch > 15 then
+                            branch = branch:sub(1, 12) .. '...'
+                        end
+
+                        return icon .. ' ' .. branch
                     end,
                 },
                 lualine_c = {
