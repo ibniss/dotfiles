@@ -22,7 +22,7 @@ return {
                 },
             },
             config = function()
-                local rose_pine = require('rose-pine.palette')
+                local tokyonight = require('tokyonight.colors').setup()
 
                 require('notify').setup({
                     timeout = 1500,
@@ -40,7 +40,7 @@ return {
                     render = 'wrapped-compact',
                 })
 
-                vim.cmd([[ hi NotifyBackground guibg = ]] .. rose_pine.base)
+                vim.cmd([[ hi NotifyBackground guibg = ]] .. tokyonight.bg)
             end,
         },
     },

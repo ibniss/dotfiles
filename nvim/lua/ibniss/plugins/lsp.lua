@@ -176,7 +176,7 @@ return {
                     'tsserver',
                     'lua_ls',
                     'rust_analyzer',
-                    'pyright',
+                    'basedpyright',
                     'eslint',
                 },
                 handlers = {
