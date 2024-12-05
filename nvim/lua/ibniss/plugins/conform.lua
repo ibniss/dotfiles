@@ -21,7 +21,22 @@ return {
             -- Define your formatters
             formatters_by_ft = {
                 lua = { 'stylua' },
-                python = { 'isort', 'blue' },
+                python = function(bufnr)
+                    if
+                        require('conform').get_formatter_info(
+                            'ruff_format',
+                            bufnr
+                        ).available
+                        and require('conform').get_formatter_info(
+                            'ruff_organize_imports',
+                            bufnr
+                        ).available
+                    then
+                        return { 'ruff_organize_imports', 'ruff_format' }
+                    else
+                        return { 'isort', 'blue' }
+                    end
+                end,
                 javascript = { 'prettier' },
                 typescript = { 'prettier' },
                 javascriptreact = { 'prettier' },

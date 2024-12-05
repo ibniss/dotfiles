@@ -7,6 +7,7 @@ end
 
 return {
     'f-person/auto-dark-mode.nvim',
+    dependencies = { 'rcarriga/nvim-notify' },
     opts = {
         update_interval = 3000,
         set_dark_mode = function()
