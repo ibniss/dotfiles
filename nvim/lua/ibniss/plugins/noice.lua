@@ -65,6 +65,10 @@ return {
                 view = 'mini',
             },
         },
+        popupmenu = {
+            -- override the cmdline autocompletions to show the same cmp menu
+            backend = 'cmp',
+        },
         hover = {
             silent = true, -- don't notify when no hover info
         },

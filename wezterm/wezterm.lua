@@ -58,7 +58,7 @@ local base_project_path = home .. '/code'
 
 -- build up a list of projects to select from
 local projects_table = {
-     -- special case for dotfiles which are not in code
+    -- special case for dotfiles which are not in code
     { id = '~/dotfiles', label = 'dotfiles' },
 }
 
@@ -239,7 +239,9 @@ wezterm.on('update-right-status', function(window, pane)
     overrides.color_scheme = scheme_for_appearance(appearance)
     window:set_config_overrides(overrides)
 
-    local theme_colors = wezterm.get_builtin_color_schemes()[appearance:find('Dark') and 'tokyonight_moon' or 'tokyonight_day']
+    local theme_colors = wezterm.get_builtin_color_schemes()[appearance:find(
+        'Dark'
+    ) and 'tokyonight_moon' or 'tokyonight_day']
     local date = wezterm.strftime('%H:%M')
 
     window:set_right_status(wezterm.format({
@@ -261,19 +263,8 @@ config.enable_tab_bar = true
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false -- look like native
 
--- Font
-config.font = wezterm.font({
-    family = 'JetBrains Mono',
-    harfbuzz_features = {
-        'ss01',
-        'ss02',
-        'ss03',
-        'ss04',
-        'ss05',
-        'ss06',
-        'ss07',
-        'ss08',
-    },
+config.font = wezterm.font('Iosevka Custom', {
+    stretch = 'Expanded',
 })
 
 -- Linux conf
@@ -281,7 +272,7 @@ config.font = wezterm.font({
 -- config.line_height = 1
 
 -- macOS conf
-config.font_size = 16
+config.font_size = 18
 config.line_height = 1.2
 
 -- keys

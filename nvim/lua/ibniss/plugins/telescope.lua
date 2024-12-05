@@ -31,6 +31,11 @@ return {
         vim.keymap.set('n', '<C-p>', builtin.git_files, {})
         --- Project Search
         vim.keymap.set('n', '<leader>ps', builtin.live_grep, {})
+
+        -- vim.keymap.set('n', '<leader>pp', function()
+        --     builtin.live_grep({ glob_pattern = vim.fn.input("Pattern > ") })
+        -- end)
+
         --- View Workspace Symbols / Document Symbols
         vim.keymap.set(
             'n',

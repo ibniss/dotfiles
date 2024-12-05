@@ -37,6 +37,7 @@ return {
             },
             { 'hrsh7th/cmp-buffer' }, -- Optional
             { 'hrsh7th/cmp-path' }, -- Optional
+            { 'hrsh7th/cmp-cmdline' }, -- Cmdline completions
             { 'saadparwaiz1/cmp_luasnip' }, -- Optional
             { 'hrsh7th/cmp-nvim-lua' }, -- Optional
             -- icons for completion items
@@ -110,6 +111,27 @@ return {
                     completion = cmp.config.window.bordered(),
                 },
             })
+
+            -- Cmdline
+            cmp.setup.cmdline('/', {
+                mapping = cmp.mapping.preset.cmdline(),
+                sources = {
+                    { name = 'buffer' },
+                },
+            })
+            cmp.setup.cmdline(':', {
+                mapping = cmp.mapping.preset.cmdline(),
+                sources = cmp.config.sources({
+                    { name = 'path' },
+                }, {
+                    {
+                        name = 'cmdline',
+                        option = {
+                            ignore_cmds = { 'Man', '!' },
+                        },
+                    },
+                }),
+            })
         end,
     },
     -- LSP
@@ -133,13 +155,27 @@ return {
                 -- see :help lsp-zero-keybindings
                 -- to learn the available actions
                 local opts = { buffer = bufnr, remap = false }
-                vim.keymap.set('n', 'gd', require('telescope.builtin').lsp_definitions, opts)
+                vim.keymap.set(
+                    'n',
+                    'gd',
+                    require('telescope.builtin').lsp_definitions,
+                    opts
+                )
                 vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-                vim.keymap.set('n', 'gr', require('telescope.builtin').lsp_references, opts)
-                vim.keymap.set('n', 'gI', require('telescope.builtin').lsp_implementations, opts)
-                vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-                vim.keymap.set('n', '[d', vim.diagnostic.goto_next, opts)
-                vim.keymap.set('n', ']d', vim.diagnostic.goto_prev, opts)
+                vim.keymap.set(
+                    'n',
+                    'gr',
+                    require('telescope.builtin').lsp_references,
+                    opts
+                )
+                vim.keymap.set(
+                    'n',
+                    'gI',
+                    require('telescope.builtin').lsp_implementations,
+                    opts
+                )
+                vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
+                vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
 
                 vim.keymap.set(
                     'n',

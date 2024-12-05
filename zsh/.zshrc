@@ -45,6 +45,9 @@ export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:";
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
 # >>BREW END
 
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
+
 export VOLTA_HOME=$HOME/.volta
 export PATH="$VOLTA_HOME/bin:$PATH"
 
