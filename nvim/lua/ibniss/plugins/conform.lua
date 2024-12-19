@@ -1,6 +1,9 @@
 return {
     {
         'stevearc/conform.nvim',
+        dependencies = {
+            'neovim/nvim-lspconfig',
+        },
         event = { 'BufWritePre' },
         cmd = { 'ConformInfo' },
         keys = {
@@ -42,12 +45,23 @@ return {
                 javascriptreact = { 'prettier' },
                 typescriptreact = { 'prettier' },
                 json = { 'prettier' },
+                ocaml = { 'ocamlformat' },
+                ocaml_mlx = { 'ocamlformat_mlx' },
             },
             -- Customize formatters
             formatters = {
                 shfmt = {
                     prepend_args = { '-i', '2' },
                 },
+                -- use dune tools exec ... for ocamlformat
+                ocamlformat = {
+                    command = 'dune',
+                    prepend_args = { 'tools', 'exec', 'ocamlformat', '--' },
+                },
+                ocamlformat_mlx = {
+                    command = 'dune',
+                    prepend_args = { 'tools', 'exec', 'ocamlformat_mlx', '--' },
+                }
             },
         },
         init = function()
