@@ -48,3 +48,6 @@ vim.keymap.set(
 
 -- chmod+x current file
 vim.keymap.set('n', '<leader>x', '<cmd>!chmod +x %<CR>', { silent = true })
+
+-- set double ESC to quit terminal mode
+vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>')
