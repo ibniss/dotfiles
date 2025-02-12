@@ -66,7 +66,7 @@ return {
             },
         },
         popupmenu = {
-            -- override the cmdline autocompletions to show the same cmp menu
+            -- -- override the cmdline autocompletions to show the same cmp menu
             backend = 'cmp',
         },
         hover = {

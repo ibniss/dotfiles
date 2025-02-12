@@ -42,7 +42,7 @@ return {
                 -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
                 auto_install = true,
                 indent = {
-                    enable = true,
+                    enable = false,
                 },
 
                 highlight = {
@@ -68,10 +68,10 @@ return {
             })
         end,
     },
-    {
-        'nvim-treesitter/nvim-treesitter-context',
-        opts = {},
-    },
+    -- {
+    --     'nvim-treesitter/nvim-treesitter-context',
+    --     opts = {},
+    -- },
     {
         'nvim-treesitter/nvim-treesitter-textobjects',
     },

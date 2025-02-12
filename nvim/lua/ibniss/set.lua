@@ -6,8 +6,8 @@ vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
-vim.opt.smartindent = true
-vim.opt.breakindent = true
+-- vim.opt.smartindent = true
+-- vim.opt.breakindent = true
 
 vim.opt.wrap = false
 
@@ -34,3 +34,4 @@ vim.opt.cursorlineopt = 'number'
 
 -- fold stuff
 require('ibniss.util.foldtext').setup()
+

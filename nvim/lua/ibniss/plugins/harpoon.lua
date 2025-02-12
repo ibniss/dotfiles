@@ -5,7 +5,7 @@ return {
         local ui = require('harpoon.ui')
 
         ---  add file
-        vim.keymap.set('n', '<leader>a', mark.add_file)
+        vim.keymap.set('n', '<leader>ha', mark.add_file)
         vim.keymap.set('n', '<C-e>', ui.toggle_quick_menu)
 
         --- Files 1-2-3-4 -> space - h - 1/2/3/4
