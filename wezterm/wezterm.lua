@@ -85,7 +85,20 @@ config.term = 'wezterm'
 config.leader = { key = 'a', mods = 'CTRL', timeout_milliseconds = 1000 }
 
 config.keys = {
-    -- splitting
+    -- move words left/right
+    {
+        key = 'LeftArrow',
+        mods = 'OPT',
+        action = wezterm.action.SendKey({
+            key = 'b',
+            mods = 'ALT',
+        }),
+    },
+    {
+        key = 'RightArrow',
+        mods = 'OPT',
+        action = wezterm.action.SendKey({ key = 'f', mods = 'ALT' }),
+    },
     {
         mods = 'LEADER | SHIFT',
         key = '"',
