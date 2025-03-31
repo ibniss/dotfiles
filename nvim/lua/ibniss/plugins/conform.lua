@@ -17,7 +17,7 @@ return {
                     })
                 end,
                 mode = '',
-                desc = 'Format buffer',
+                desc = '[F]ormat buffer',
             },
         },
         opts = {
@@ -26,14 +26,8 @@ return {
                 lua = { 'stylua' },
                 python = function(bufnr)
                     if
-                        require('conform').get_formatter_info(
-                            'ruff_format',
-                            bufnr
-                        ).available
-                        and require('conform').get_formatter_info(
-                            'ruff_organize_imports',
-                            bufnr
-                        ).available
+                        require('conform').get_formatter_info('ruff_format', bufnr).available
+                        and require('conform').get_formatter_info('ruff_organize_imports', bufnr).available
                     then
                         return { 'ruff_organize_imports', 'ruff_format' }
                     else
@@ -61,7 +55,7 @@ return {
                 ocamlformat_mlx = {
                     command = 'dune',
                     prepend_args = { 'tools', 'exec', 'ocamlformat_mlx', '--' },
-                }
+                },
             },
         },
         init = function()

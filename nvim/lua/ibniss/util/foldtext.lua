@@ -7,19 +7,13 @@ function M.parse_line(linenr)
     local bufnr = vim.api.nvim_get_current_buf()
 
     local line = vim.api.nvim_buf_get_lines(bufnr, linenr - 1, linenr, false)[1]
-    if not line then
-        return nil
-    end
+    if not line then return nil end
 
     local ok, parser = pcall(vim.treesitter.get_parser, bufnr)
-    if not ok then
-        return nil
-    end
+    if not ok then return nil end
 
-    local query = vim.treesitter.query.get(parser:lang(), "highlights")
-    if not query then
-        return nil
-    end
+    local query = vim.treesitter.query.get(parser:lang(), 'highlights')
+    if not query then return nil end
 
     local tree = parser:parse({ linenr - 1, linenr })[1]
 
@@ -38,14 +32,17 @@ function M.parse_line(linenr)
             if start_col > line_pos then
                 table.insert(result, {
                     line:sub(line_pos + 1, start_col),
-                    { { "Folded", priority } },
+                    { { 'Folded', priority } },
                     range = { line_pos, start_col },
                 })
             end
             line_pos = end_col
 
             local text = line:sub(start_col + 1, end_col)
-            table.insert(result, { text, { { "@" .. name, priority } }, range = { start_col, end_col } })
+            table.insert(
+                result,
+                { text, { { '@' .. name, priority } }, range = { start_col, end_col } }
+            )
         end
     end
 
@@ -53,11 +50,13 @@ function M.parse_line(linenr)
     while i <= #result do
         -- find first capture that is not in current range and apply highlights on the way
         local j = i + 1
-        while j <= #result and result[j].range[1] >= result[i].range[1] and result[j].range[2] <= result[i].range[2] do
+        while
+            j <= #result
+            and result[j].range[1] >= result[i].range[1]
+            and result[j].range[2] <= result[i].range[2]
+        do
             for k, v in ipairs(result[i][2]) do
-                if not vim.tbl_contains(result[j][2], v) then
-                    table.insert(result[j][2], k, v)
-                end
+                if not vim.tbl_contains(result[j][2], v) then table.insert(result[j][2], k, v) end
             end
             j = j + 1
         end
@@ -69,14 +68,10 @@ function M.parse_line(linenr)
             -- highlights need to be sorted by priority, on equal prio, the deeper nested capture (earlier
             -- in list) should be considered higher prio
             if #result[i][2] > 1 then
-                table.sort(result[i][2], function(a, b)
-                    return a[2] < b[2]
-                end)
+                table.sort(result[i][2], function(a, b) return a[2] < b[2] end)
             end
 
-            result[i][2] = vim.tbl_map(function(tbl)
-                return tbl[1]
-            end, result[i][2])
+            result[i][2] = vim.tbl_map(function(tbl) return tbl[1] end, result[i][2])
             result[i] = { result[i][1], result[i][2] }
 
             i = i + 1
@@ -88,19 +83,20 @@ end
 
 function HighlightedFoldtext()
     local result = M.parse_line(vim.v.foldstart)
-    if not result then
-        return vim.fn.foldtext()
-    end
+    if not result then return vim.fn.foldtext() end
 
     -- add 'Folded' group to each item
     for _, item in ipairs(result) do
-        table.insert(item[2], "Folded")
+        table.insert(item[2], 'Folded')
     end
 
     local folded = {
-        { " ",                                                { "Normal", "Folded" } },
-        { "+" .. vim.v.foldend - vim.v.foldstart .. " lines", { "Whitespace", "Folded" } },
-        { " ... ",                                            { "@punctuation.bracket", "Folded" } },
+        { ' ', { 'Normal', 'Folded' } },
+        { '+' .. vim.v.foldend - vim.v.foldstart .. ' lines', { 'Whitespace', 'Folded' } },
+        {
+            ' ... ',
+            { '@punctuation.bracket', 'Folded' },
+        },
     }
 
     for _, item in ipairs(folded) do
@@ -121,23 +117,22 @@ end
 
 local function set_fold_hl()
     -- use visual highlight color
-    local cl = vim.api.nvim_get_hl(0, { name = "Visual" })
-    vim.api.nvim_set_hl(0, "Folded", { bg = cl.bg })
+    local cl = vim.api.nvim_get_hl(0, { name = 'Visual' })
+    vim.api.nvim_set_hl(0, 'Folded', { bg = cl.bg })
 end
-
 
 function M.setup()
     set_fold_hl()
 
-    vim.api.nvim_create_autocmd("ColorScheme", {
+    vim.api.nvim_create_autocmd('ColorScheme', {
         callback = set_fold_hl,
     })
 
-    vim.opt.fillchars:append('fold: ')                    -- don't add dots to end of foldtext
-    vim.opt.foldlevelstart = 99                           -- start open
+    vim.opt.fillchars:append('fold: ') -- don't add dots to end of foldtext
+    vim.opt.foldlevelstart = 99 -- start open
     vim.opt.foldlevel = 99
-    vim.opt.foldmethod = 'expr'                           -- auto find fold points
-    vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'  -- use treesitter to find them
+    vim.opt.foldmethod = 'expr' -- auto find fold points
+    vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()' -- use treesitter to find them
     vim.opt.foldtext = 'luaeval("HighlightedFoldtext")()' -- use our custom highlight using treesitter
 end
 

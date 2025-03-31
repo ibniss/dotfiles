@@ -7,15 +7,15 @@ return {
     },
     opts = {
         commit_editor = {
-            kind = "tab",
+            kind = 'tab',
             show_staged_diff = true,
-            staged_diff_split_kind = "vsplit",
+            staged_diff_split_kind = 'vsplit',
             spell_check = true,
         },
         integrations = {
             telescope = true,
             diffview = true,
-        }
+        },
     },
     keys = {
         { '<leader>gs', '<cmd>Neogit<cr>', desc = 'Neogit' },

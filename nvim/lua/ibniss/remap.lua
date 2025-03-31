@@ -9,13 +9,19 @@ vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 -- makes J work the same but cursor stays in place
 vim.keymap.set('n', 'J', 'mzJ`z')
 
--- allow C-D/U (half page jumping) to keep cursor in the middle
-vim.keymap.set('n', '<C-d>', '<C-d>zz')
-vim.keymap.set('n', '<C-u>', '<C-u>zz')
-
--- allows n/N to keep search term in the middle
-vim.keymap.set('n', 'n', 'nzzzv')
-vim.keymap.set('n', 'N', 'Nzzzv')
+-- Center cursor while jumping:
+vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Scroll up and center cursor' })
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Scroll down and center cursor' })
+vim.keymap.set('n', '{', '{zz', { desc = 'Jump to previous paragraph and center' })
+vim.keymap.set('n', '}', '}zz', { desc = 'Jump to next paragraph and center' })
+vim.keymap.set('n', 'N', 'Nzz', { desc = 'Search previous and center' })
+vim.keymap.set('n', 'n', 'nzz', { desc = 'Search next and center' })
+vim.keymap.set('n', 'G', 'Gzz', { desc = 'Go to end of file and center' })
+vim.keymap.set('n', 'gg', 'ggzz', { desc = 'Go to beginning of file and center' })
+vim.keymap.set('n', 'gd', 'gdzz', { desc = 'Go to definition and center' })
+vim.keymap.set('n', '%', '%zz', { desc = 'Jump to matching bracket and center' })
+vim.keymap.set('n', '*', '*zz', { desc = 'Search for word under cursor and center' })
+vim.keymap.set('n', '#', '#zz', { desc = 'Search backward for word under cursor and center' })
 
 -- paste and move into void register, otherwise replaced word would end up replacing previous copy
 vim.keymap.set('x', '<leader>p', [["_dP]])
@@ -33,21 +39,12 @@ vim.keymap.set('i', '<C-c>', '<Esc>')
 -- Disables Q (ex mode)
 vim.keymap.set('n', 'Q', '<nop>')
 
--- quick fix navigation?
-vim.keymap.set('n', '<C-k>', '<cmd>cnext<CR>zz')
-vim.keymap.set('n', '<C-j>', '<cmd>cprev<CR>zz')
-vim.keymap.set('n', '<leader>k', '<cmd>lnext<CR>zz')
-vim.keymap.set('n', '<leader>j', '<cmd>lprev<CR>zz')
+-- quick fix navigation
+vim.api.nvim_set_keymap('n', ']q', ':cnext<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '[q', ':cprev<CR>', { noremap = true, silent = true })
 
 -- replace selected word
-vim.keymap.set(
-    'n',
-    '<leader>s',
-    [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]]
-)
+vim.keymap.set('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
 -- chmod+x current file
 vim.keymap.set('n', '<leader>x', '<cmd>!chmod +x %<CR>', { silent = true })
-
--- set double ESC to quit terminal mode
-vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>')

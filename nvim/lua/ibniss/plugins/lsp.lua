@@ -9,6 +9,7 @@ return {
             { 'hrsh7th/cmp-cmdline' }, -- Cmdline completions
             { 'hrsh7th/cmp-nvim-lua' }, -- Optional
             { 'hrsh7th/cmp-nvim-lsp' },
+            { 'hrsh7th/cmp-nvim-lsp-signature-help' },
             -- icons for completion items
             { 'onsails/lspkind.nvim' },
         },
@@ -30,9 +31,9 @@ return {
                     { name = 'path' },
                     { name = 'nvim_lsp' },
                     { name = 'nvim_lua' },
+                    { name = 'nvim_lsp_signature_help' },
                     { name = 'buffer', keyword_length = 3 },
                 },
-                -- formatting = lsp_zero.cmp_format({ details = false }),
                 formatting = {
                     expandable_indicator = true,
                     fields = {
@@ -119,9 +120,7 @@ return {
             local servers = {
                 lua_ls = true,
                 ts_ls = {
-                    root_dir = require('lspconfig').util.root_pattern(
-                        'package.json'
-                    ),
+                    root_dir = require('lspconfig').util.root_pattern('package.json'),
                     single_file = false,
                     server_capabilities = {
                         documentFormattingProvider = false,
@@ -201,59 +200,78 @@ return {
                     local settings = servers[client.name]
                     if type(settings) ~= 'table' then settings = {} end
 
-                    local opts = { buffer = bufnr, remap = false }
-                    vim.keymap.set(
-                        'n',
-                        'gd',
-                        require('telescope.builtin').lsp_definitions,
-                        opts
-                    )
-                    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-                    vim.keymap.set(
-                        'n',
-                        'gr',
-                        require('telescope.builtin').lsp_references,
-                        opts
-                    )
-                    vim.keymap.set(
-                        'n',
+                    -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
+                    ---@param method string
+                    ---@return boolean
+                    local function client_supports_method(method)
+                        if vim.fn.has('nvim-0.11') == 1 then
+                            return client:supports_method(method, bufnr)
+                        else
+                            return client.supports_method(method, { bufnr = bufnr })
+                        end
+                    end
+
+                    --- helper function to set keymaps
+                    --- @param keys string
+                    --- @param func function | string
+                    --- @param desc string
+                    --- @param mode string|string[]?
+                    local map = function(keys, func, desc, mode)
+                        mode = mode or 'n'
+                        vim.keymap.set(mode, keys, func, { buffer = bufnr, desc = 'LSP: ' .. desc })
+                    end
+
+                    map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+                    map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+                    map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+                    map(
                         'gI',
                         require('telescope.builtin').lsp_implementations,
-                        opts
+                        '[G]oto [I]mplementations'
                     )
-                    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-                    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+                    map('[d', function()
+                        vim.diagnostic.goto_prev()
+                        vim.api.nvim_feedkeys('zz', 'n', false)
+                    end, '[G]oto [P]rev and center')
+                    map(']d', function()
+                        vim.diagnostic.goto_next()
+                        vim.api.nvim_feedkeys('zz', 'n', false)
+                    end, '[G]oto [N]ext and center')
+
+                    vim.keymap.set('n', ']e', function()
+                        vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+                        vim.api.nvim_feedkeys('zz', 'n', false)
+                    end, { desc = 'Go to next error diagnostic and center' })
+
+                    vim.keymap.set('n', '[e', function()
+                        vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+                        vim.api.nvim_feedkeys('zz', 'n', false)
+                    end, { desc = 'Go to previous error diagnostic and center' })
+
+                    map(
+                        '<leader>ds',
+                        require('telescope.builtin').lsp_document_symbols,
+                        '[D]ocument [S]ymbols'
+                    )
+
+                    map(
+                        '<leader>ws',
+                        require('telescope.builtin').lsp_dynamic_workspace_symbols,
+                        '[W]orkspace [S]ymbols'
+                    )
+
+                    map(
+                        '<leader>e',
+                        vim.diagnostic.open_float,
+                        'Open float window with diagnostics'
+                    )
+                    map('<leader>q', vim.diagnostic.setloclist, 'Add buffer diagnostics to loclist')
+                    map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
 
                     vim.keymap.set(
                         'n',
-                        '<leader>e',
-                        vim.diagnostic.open_float,
-                        opts
-                    )
-                    vim.keymap.set(
-                        'n',
-                        '<leader>q',
-                        vim.diagnostic.setloclist,
-                        opts
-                    )
-                    vim.keymap.set(
-                        'n',
-                        '<leader>vca',
-                        vim.lsp.buf.code_action,
-                        opts
-                    )
-                    vim.keymap.set(
-                        'n',
-                        '<leader>vrr',
-                        vim.lsp.buf.references,
-                        opts
-                    )
-                    vim.keymap.set(
-                        'n',
-                        '<leader>vrn',
-                        function()
-                            return ':IncRename ' .. vim.fn.expand('<cword>')
-                        end,
+                        '<leader>rn',
+                        function() return ':IncRename ' .. vim.fn.expand('<cword>') end,
                         { expr = true }
                     )
 
@@ -262,8 +280,23 @@ return {
                         'i',
                         '<C-h>',
                         vim.lsp.buf.signature_help,
-                        opts
+                        { buffer = bufnr, desc = '[C-h] Signature Help' }
                     )
+
+                    if
+                        client
+                        and client_supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint)
+                    then
+                        map(
+                            '<leader>th',
+                            function()
+                                vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({
+                                    bufnr = bufnr,
+                                }))
+                            end,
+                            '[T]oggle Inlay [H]ints'
+                        )
+                    end
 
                     -- Override server capabilities
                     if settings.server_capabilities then

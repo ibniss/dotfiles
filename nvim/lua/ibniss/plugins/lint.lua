@@ -32,9 +32,7 @@ return {
             local names = lint._resolve_linter_by_ft(vim.bo.filetype)
 
             -- Add fallback linters.
-            if #names == 0 then
-                vim.list_extend(names, lint.linters_by_ft['_'] or {})
-            end
+            if #names == 0 then vim.list_extend(names, lint.linters_by_ft['_'] or {}) end
 
             -- Add global linters.
             vim.list_extend(names, lint.linters_by_ft['*'] or {})
