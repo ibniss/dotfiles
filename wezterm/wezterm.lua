@@ -16,15 +16,13 @@ local function is_vim(pane)
     return pane:get_user_vars().IS_NVIM == 'true'
 end
 
---- Create a split-nav keybinding
----@param resize_or_move 'resize' | 'move' Resize or move the pane
----@param key 'h'|'j'|'k'|'l' HJKL key
-local function split_nav(resize_or_move, key)
-    local adjusted_key = resize_or_move == 'move' and key
-        or direction_keys[key] .. 'Arrow'
+--- Create a split-nav resize keybinding
+---@param key 'Left'|'Right'|'Up'|'Down' arrow key
+local function split_nav_resize(key)
+    local adjusted_key = key .. 'Arrow'
 
     return {
-        -- move with HJKL, resize with arrows
+        -- resize with arrows
         key = adjusted_key,
         mods = 'LEADER',
         action = wezterm.action_callback(function(win, pane)
@@ -37,17 +35,27 @@ local function split_nav(resize_or_move, key)
                     SendKey = { key = adjusted_key },
                 }, pane)
             else
-                if resize_or_move == 'resize' then
-                    win:perform_action(
-                        { AdjustPaneSize = { direction_keys[key], 3 } },
-                        pane
-                    )
-                else
-                    win:perform_action(
-                        { ActivatePaneDirection = direction_keys[key] },
-                        pane
-                    )
-                end
+                win:perform_action({ AdjustPaneSize = { key, 3 } }, pane)
+            end
+        end),
+    }
+end
+
+--- Create a split-nav move keybinding
+---@param key 'h'|'j'|'k'|'l' HJKL key
+local function split_nav_move(key)
+    return {
+        -- move with HJKL
+        key = key,
+        mods = 'CTRL',
+        action = wezterm.action_callback(function(win, pane)
+            if is_vim(pane) then
+                -- pass the keys through to vim/nvim, have to do it separately
+                win:perform_action({
+                    SendKey = { key = key, mods = 'CTRL' },
+                }, pane)
+            else
+                win:perform_action({ ActivatePaneDirection = direction_keys[key] }, pane)
             end
         end),
     }
@@ -113,15 +121,16 @@ config.keys = {
     },
 
     -- move between split panes
-    split_nav('move', 'h'),
-    split_nav('move', 'j'),
-    split_nav('move', 'k'),
-    split_nav('move', 'l'),
+    split_nav_move('h'),
+    split_nav_move('j'),
+    split_nav_move('k'),
+    split_nav_move('l'),
+
     -- resize panes
-    split_nav('resize', 'h'),
-    split_nav('resize', 'j'),
-    split_nav('resize', 'k'),
-    split_nav('resize', 'l'),
+    split_nav_resize('Left'),
+    split_nav_resize('Right'),
+    split_nav_resize('Up'),
+    split_nav_resize('Down'),
 
     -- Creating a new tab (tmux window)
     {
@@ -187,25 +196,23 @@ config.keys = {
         action = wezterm.action_callback(function(window, pane)
             window:perform_action(
                 wezterm.action.InputSelector({
-                    action = wezterm.action_callback(
-                        function(inner_window, inner_pane, id, label)
-                            if not id and not label then
-                                wezterm.log_info('No project selected')
-                            else
-                                wezterm.log_info('Selected project: ' .. id)
-                                inner_window:perform_action(
-                                    wezterm.action.SwitchToWorkspace({
-                                        name = label,
-                                        spawn = {
-                                            label = 'Workspace: ' .. label,
-                                            cwd = id,
-                                        },
-                                    }),
-                                    inner_pane
-                                )
-                            end
+                    action = wezterm.action_callback(function(inner_window, inner_pane, id, label)
+                        if not id and not label then
+                            wezterm.log_info('No project selected')
+                        else
+                            wezterm.log_info('Selected project: ' .. id)
+                            inner_window:perform_action(
+                                wezterm.action.SwitchToWorkspace({
+                                    name = label,
+                                    spawn = {
+                                        label = 'Workspace: ' .. label,
+                                        cwd = id,
+                                    },
+                                }),
+                                inner_pane
+                            )
                         end
-                    ),
+                    end),
                     title = 'Choose Project',
                     choices = projects_table,
                     fuzzy = true,
@@ -252,9 +259,8 @@ wezterm.on('update-right-status', function(window, pane)
     overrides.color_scheme = scheme_for_appearance(appearance)
     window:set_config_overrides(overrides)
 
-    local theme_colors = wezterm.get_builtin_color_schemes()[appearance:find(
-        'Dark'
-    ) and 'tokyonight_moon' or 'tokyonight_day']
+    local theme_colors =
+        wezterm.get_builtin_color_schemes()[appearance:find('Dark') and 'tokyonight_moon' or 'tokyonight_day']
     local date = wezterm.strftime('%H:%M')
 
     window:set_right_status(wezterm.format({

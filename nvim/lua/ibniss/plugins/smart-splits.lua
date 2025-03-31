@@ -10,11 +10,11 @@ return {
         vim.keymap.set('n', '<C-a><Up>', ss.resize_up)
         vim.keymap.set('n', '<C-a><Right>', ss.resize_right)
 
-        -- moving between splits (must match WezTerm config)
-        vim.keymap.set('n', '<C-a>h', ss.move_cursor_left)
-        vim.keymap.set('n', '<C-a>j', ss.move_cursor_down)
-        vim.keymap.set('n', '<C-a>k', ss.move_cursor_up)
-        vim.keymap.set('n', '<C-a>l', ss.move_cursor_right)
+        -- moving between splits with C + direction hjkl(must match WezTerm config)
+        vim.keymap.set('n', '<C-h>', ss.move_cursor_left)
+        vim.keymap.set('n', '<C-j>', ss.move_cursor_down)
+        vim.keymap.set('n', '<C-k>', ss.move_cursor_up)
+        vim.keymap.set('n', '<C-l>', ss.move_cursor_right)
 
         -- swapping buffers between windows
         --vim.keymap.set('n', '<leader><leader>h', ss.swap_buf_left)
