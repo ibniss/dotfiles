@@ -7,7 +7,7 @@ return {
         styles = {
             floats = 'transparent',
             sidebars = 'transparent',
-        }
+        },
     },
     init = function()
         -- load the colorscheme here

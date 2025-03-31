@@ -18,7 +18,7 @@ return {
                 ['ui-select'] = {
                     require('telescope.themes').get_dropdown(),
                 },
-                fzf = {}
+                fzf = {},
             },
         })
 
@@ -26,40 +26,27 @@ return {
         pcall(require('telescope').load_extension, 'ui-select')
 
         local builtin = require('telescope.builtin')
-        --- Project Files (all)
-        vim.keymap.set('n', '<leader>pf', builtin.find_files, {})
-        --- Git Files
-        vim.keymap.set('n', '<C-p>', builtin.git_files, {})
-        --- Project Search
-        vim.keymap.set('n', '<leader>ps', builtin.live_grep, {})
+        vim.keymap.set('n', '<C-p>', builtin.git_files, { desc = '[C-p] Git Files' })
+        vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+        vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
+        vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+        vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
+        vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+        vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
+        vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+        vim.keymap.set(
+            'n',
+            '<leader>s.',
+            builtin.oldfiles,
+            { desc = '[S]earch Recent Files ("." for repeat)' }
+        )
+        vim.keymap.set('n', '<leader>sb', builtin.buffers, { desc = '[S]earch [B]uffers' })
 
-        -- vim.keymap.set('n', '<leader>pp', function()
-        --     builtin.live_grep({ glob_pattern = vim.fn.input("Pattern > ") })
-        -- end)
-
-        --- View Workspace Symbols / Document Symbols
-        vim.keymap.set(
-            'n',
-            '<leader>vws',
-            builtin.lsp_dynamic_workspace_symbols,
-            {}
-        )
-        vim.keymap.set('n', '<leader>vds', builtin.lsp_document_symbols, {})
-        -- word search under cursor
-        vim.keymap.set(
-            'n',
-            '<leader>pws',
-            function()
-                builtin.grep_string({ search = vim.fn.expand('<cword>') })
-            end
-        )
-        vim.keymap.set(
-            'n',
-            '<leader>pWs',
-            function()
-                builtin.grep_string({ search = vim.fn.expand('<cWORD>') })
-            end
-        )
-        vim.keymap.set('n', '<leader>vh', builtin.help_tags, {})
+        vim.keymap.set('n', '<leader>/', function()
+            -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+            builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown({
+                previewer = false,
+            }))
+        end, { desc = '[/] Fuzzily search in current buffer' })
     end,
 }

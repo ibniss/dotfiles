@@ -5,6 +5,8 @@ return {
         bigfile = {
             enabled = true,
         },
+        -- better vim.ui.input
+        input = {},
     },
     config = function()
         local Snacks = require('snacks')
@@ -23,7 +25,7 @@ return {
                 win = Snacks.terminal.toggle(nil, {
                     win = {
                         height = 0.3,
-                        position = 'right'
+                        position = 'right',
                     },
                 })
             else

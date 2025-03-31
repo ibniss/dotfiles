@@ -34,12 +34,7 @@ local function get_clients(opts)
         if opts and opts.method then
             ---@param client lsp.Client
             ret = vim.tbl_filter(
-                function(client)
-                    return client.supports_method(
-                        opts.method,
-                        { bufnr = opts.bufnr }
-                    )
-                end,
+                function(client) return client.supports_method(opts.method, { bufnr = opts.bufnr }) end,
                 ret
             )
         end
@@ -73,9 +68,7 @@ function M.detectors.pattern(buf, patterns)
     return pattern and { vim.fs.dirname(pattern) } or {}
 end
 
-function M.bufpath(buf)
-    return M.realpath(vim.api.nvim_buf_get_name(assert(buf)))
-end
+function M.bufpath(buf) return M.realpath(vim.api.nvim_buf_get_name(assert(buf))) end
 
 function M.cwd() return M.realpath(vim.loop.cwd()) or '' end
 
@@ -99,12 +92,8 @@ end
 ---@param opts? { buf?: number, spec?: LazyRootSpec[], all?: boolean }
 function M.detect(opts)
     opts = opts or {}
-    opts.spec = opts.spec
-        or type(vim.g.root_spec) == 'table' and vim.g.root_spec
-        or M.spec
-    opts.buf = (opts.buf == nil or opts.buf == 0)
-            and vim.api.nvim_get_current_buf()
-        or opts.buf
+    opts.spec = opts.spec or type(vim.g.root_spec) == 'table' and vim.g.root_spec or M.spec
+    opts.buf = (opts.buf == nil or opts.buf == 0) and vim.api.nvim_get_current_buf() or opts.buf
 
     local ret = {} ---@type LazyRoot[]
     for _, spec in ipairs(opts.spec) do
@@ -114,9 +103,7 @@ function M.detect(opts)
         local roots = {} ---@type string[]
         for _, p in ipairs(paths) do
             local pp = M.realpath(p)
-            if pp and not vim.tbl_contains(roots, pp) then
-                roots[#roots + 1] = pp
-            end
+            if pp and not vim.tbl_contains(roots, pp) then roots[#roots + 1] = pp end
         end
         table.sort(roots, function(a, b) return #a > #b end)
         if #roots > 0 then
@@ -138,8 +125,7 @@ function M.info()
             lines[#lines + 1] = ('- [%s] `%s` **(%s)**'):format(
                 first and 'x' or ' ',
                 path,
-                type(root.spec) == 'table' and table.concat(root.spec, ', ')
-                    or root.spec
+                type(root.spec) == 'table' and table.concat(root.spec, ', ') or root.spec
             )
             first = false
         end
@@ -161,10 +147,7 @@ function M.setup()
     )
 
     vim.api.nvim_create_autocmd({ 'LspAttach', 'BufWritePost' }, {
-        group = vim.api.nvim_create_augroup(
-            'lazyvim_root_cache',
-            { clear = true }
-        ),
+        group = vim.api.nvim_create_augroup('lazyvim_root_cache', { clear = true }),
         callback = function(event) M.cache[event.buf] = nil end,
     })
 end

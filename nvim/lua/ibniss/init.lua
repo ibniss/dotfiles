@@ -1,5 +1,6 @@
 require('ibniss.remap')
 require('ibniss.set')
+require('ibniss.term')
 
 --- Bootstrap Lazy if not pulled already
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'

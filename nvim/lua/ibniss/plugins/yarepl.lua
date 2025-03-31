@@ -8,7 +8,6 @@ return {
         aider.setup({
             aider_args = {
                 '--watch-files',
-                '--sonnet',
                 '--no-auto-commits',
             },
         })

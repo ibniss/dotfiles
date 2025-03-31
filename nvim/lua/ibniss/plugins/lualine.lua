@@ -22,17 +22,13 @@ return {
                 lualine_b = {
                     function()
                         local icon = require('nvim-web-devicons').get_icon('git')
-                        local git = require("neogit.lib.git")
+                        local git = require('neogit.lib.git')
                         local branch = git.repo.state.head.branch
 
-                        if not branch then
-                            return ''
-                        end
+                        if not branch then return '' end
 
                         -- truncate branch name if it's too long
-                        if #branch > 15 then
-                            branch = branch:sub(1, 12) .. '...'
-                        end
+                        if #branch > 15 then branch = branch:sub(1, 12) .. '...' end
 
                         return icon .. ' ' .. branch
                     end,
@@ -53,9 +49,7 @@ return {
 
                 lualine_x = {
                     {
-                        function()
-                            return require('noice').api.status.command.get()
-                        end,
+                        function() return require('noice').api.status.command.get() end,
                         cond = function()
                             return package.loaded['noice']
                                 and require('noice').api.status.command.has()

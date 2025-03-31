@@ -68,10 +68,19 @@ return {
             })
         end,
     },
-    -- {
-    --     'nvim-treesitter/nvim-treesitter-context',
-    --     opts = {},
-    -- },
+    {
+        'nvim-treesitter/nvim-treesitter-context',
+        dependencies = { 'nvim-treesitter/nvim-treesitter' },
+        config = function()
+            local tsc = require('treesitter-context')
+
+            tsc.setup({
+                enable = true,
+                max_lines = 1,
+                trim_scope = 'inner',
+            })
+        end,
+    },
     {
         'nvim-treesitter/nvim-treesitter-textobjects',
     },
