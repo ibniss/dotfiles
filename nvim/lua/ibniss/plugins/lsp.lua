@@ -200,17 +200,6 @@ return {
                     local settings = servers[client.name]
                     if type(settings) ~= 'table' then settings = {} end
 
-                    -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
-                    ---@param method string
-                    ---@return boolean
-                    local function client_supports_method(method)
-                        if vim.fn.has('nvim-0.11') == 1 then
-                            return client:supports_method(method, bufnr)
-                        else
-                            return client.supports_method(method, { bufnr = bufnr })
-                        end
-                    end
-
                     --- helper function to set keymaps
                     --- @param keys string
                     --- @param func function | string
@@ -275,18 +264,15 @@ return {
                         { expr = true }
                     )
 
-                    --- Insert mode - C-H to show signature
+                    --- Insert mode - C-K to show signature
                     vim.keymap.set(
                         'i',
-                        '<C-h>',
+                        '<C-K>',
                         vim.lsp.buf.signature_help,
-                        { buffer = bufnr, desc = '[C-h] Signature Help' }
+                        { buffer = bufnr, desc = '[C-K] Signature Help' }
                     )
 
-                    if
-                        client
-                        and client_supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint)
-                    then
+                    if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
                         map(
                             '<leader>th',
                             function()
@@ -326,5 +312,9 @@ return {
                 },
             })
         end,
+    },
+    {
+        'hinell/lsp-timeout.nvim',
+        dependencies = { 'neovim/nvim-lspconfig' },
     },
 }

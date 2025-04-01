@@ -39,10 +39,6 @@ vim.keymap.set('i', '<C-c>', '<Esc>')
 -- Disables Q (ex mode)
 vim.keymap.set('n', 'Q', '<nop>')
 
--- quick fix navigation
-vim.api.nvim_set_keymap('n', ']q', ':cnext<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '[q', ':cprev<CR>', { noremap = true, silent = true })
-
 -- replace selected word
 vim.keymap.set('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
