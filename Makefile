@@ -3,11 +3,16 @@ link-nvim:
 	ln -s $(PWD)/nvim ~/.config/nvim
 
 link-wezterm:
-	rm ~/.wezterm.lua
+	rm -f ~/.wezterm.lua
 	ln -s $(PWD)/wezterm ~/.config/wezterm
+	rm -f ~/wezterm.sh
+	ln -s $(PWD)/wezterm/wezterm.sh ~/wezterm.sh
 
 link-zsh:
-	rm ~/.zshrc
-	ln -s $(PWD)/zsh/.zshrc ~/.zshrc
-	rm ~/.zprofile
+	rm -f ~/.zshrc
+	ln -s $(PWD)/zsh/.zshrc.linux ~/.zshrc
+	rm -f ~/.zprofile
 	ln -s $(PWD)/zsh/.zsh_profile ~/.zprofile
+
+link-keyd:
+	sudo cp $(PWD)/keyd/default.conf  /etc/keyd/default.conf
