@@ -32,6 +32,8 @@ source $ZSH/oh-my-zsh.sh
 
 # Example aliases
 alias zshconfig="nvim ~/.zshrc"
+alias vim="nvim"
+alias vi="nvim"
 
 export PATH="~/.cargo/bin:$PATH"
 
