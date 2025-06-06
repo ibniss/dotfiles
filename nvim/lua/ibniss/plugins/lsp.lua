@@ -31,7 +31,6 @@ return {
                     { name = 'path' },
                     { name = 'nvim_lsp' },
                     { name = 'nvim_lua' },
-                    { name = 'nvim_lsp_signature_help' },
                     { name = 'buffer', keyword_length = 3 },
                 },
                 formatting = {
@@ -129,6 +128,7 @@ return {
                 rust_analyzer = true,
                 basedpyright = true,
                 eslint = true,
+                jsonls = true,
                 ocamllsp = {
                     manual_install = true,
                     cmd = { 'dune', 'tools', 'exec', 'ocamllsp' },

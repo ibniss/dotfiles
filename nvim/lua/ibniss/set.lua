@@ -47,3 +47,10 @@ vim.opt.cursorlineopt = 'number'
 
 -- fold stuff
 require('ibniss.util.foldtext').setup()
+
+-- filetypes
+vim.filetype.add({
+    extension = {
+        mdx = 'markdown',
+    },
+})
