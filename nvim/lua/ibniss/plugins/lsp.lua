@@ -4,12 +4,11 @@ return {
         'hrsh7th/nvim-cmp',
         event = 'InsertEnter',
         dependencies = {
-            { 'hrsh7th/cmp-buffer' }, -- Optional
-            { 'hrsh7th/cmp-path' }, -- Optional
-            { 'hrsh7th/cmp-cmdline' }, -- Cmdline completions
+            { 'hrsh7th/cmp-buffer' },   -- Optional
+            { 'hrsh7th/cmp-path' },     -- Optional
+            { 'hrsh7th/cmp-cmdline' },  -- Cmdline completions
             { 'hrsh7th/cmp-nvim-lua' }, -- Optional
             { 'hrsh7th/cmp-nvim-lsp' },
-            { 'hrsh7th/cmp-nvim-lsp-signature-help' },
             -- icons for completion items
             { 'onsails/lspkind.nvim' },
         },
@@ -31,7 +30,8 @@ return {
                     { name = 'path' },
                     { name = 'nvim_lsp' },
                     { name = 'nvim_lua' },
-                    { name = 'buffer', keyword_length = 3 },
+                    { name = 'buffer',  keyword_length = 3 },
+                    { name = 'buffer',  keyword_length = 3 },
                 },
                 formatting = {
                     expandable_indicator = true,
@@ -125,6 +125,21 @@ return {
                         documentFormattingProvider = false,
                     },
                 },
+                gopls = {
+                    settings = {
+                        gopls = {
+                            hints = {
+                                assignVariableTypes = true,
+                                compositeLiteralFields = true,
+                                compositeLiteralTypes = true,
+                                constantValues = true,
+                                functionTypeParameters = true,
+                                parameterNames = true,
+                                rangeVariableTypes = true,
+                            },
+                        },
+                    },
+                },
                 rust_analyzer = true,
                 basedpyright = true,
                 eslint = true,
@@ -165,6 +180,7 @@ return {
                 'rust_analyzer',
                 'basedpyright',
                 'eslint',
+                'gopls'
             }
 
             -- run the mason installer
