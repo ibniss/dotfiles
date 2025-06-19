@@ -1,2 +1,5 @@
 [tools]
 node = "20"
+pnpm = "9"
+python = "3.11"
+usage = "latest"
