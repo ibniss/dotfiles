@@ -30,7 +30,7 @@ plugins=(
 
 source $ZSH/oh-my-zsh.sh
 
-# Example aliases
+# aliases
 alias zshconfig="nvim ~/.zshrc"
 alias vim="nvim"
 alias vi="nvim"
@@ -50,12 +50,15 @@ export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
 # Set up fzf key bindings and fuzzy completion
 source <(fzf --zsh)
 
-export VOLTA_HOME=$HOME/.volta
-export PATH="$VOLTA_HOME/bin:$PATH"
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 . "$HOME/.cargo/env"
+
+# dune
+source $HOME/.local/share/dune/env/env.zsh
+
+# mise
+eval "$($HOME/.local/bin/mise activate zsh)"
