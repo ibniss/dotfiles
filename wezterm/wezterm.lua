@@ -240,14 +240,17 @@ local function get_appearance()
     return 'Dark'
 end
 
-local function scheme_for_appearance(appearance)
-    if appearance:find('Dark') then return 'tokyonight_moon' end
+local dark_theme = 'tokyonight_moon'
+local light_theme = 'tokyonight_day'
 
-    return 'tokyonight_day'
+local function scheme_for_appearance(appearance)
+    if appearance:find('Dark') then return dark_theme end
+
+    return light_theme
 end
 
 config.audible_bell = 'Disabled'
-config.color_scheme = 'tokyonight_day'
+config.color_scheme = scheme_for_appearance(get_appearance())
 config.window_decorations = 'RESIZE'
 config.native_macos_fullscreen_mode = true
 
@@ -260,7 +263,7 @@ wezterm.on('update-right-status', function(window, pane)
     window:set_config_overrides(overrides)
 
     local theme_colors =
-        wezterm.get_builtin_color_schemes()[appearance:find('Dark') and 'tokyonight_moon' or 'tokyonight_day']
+        wezterm.get_builtin_color_schemes()[appearance:find('Dark') and dark_theme or light_theme]
     local date = wezterm.strftime('%H:%M')
 
     window:set_right_status(wezterm.format({
@@ -268,7 +271,7 @@ wezterm.on('update-right-status', function(window, pane)
         { Background = { Color = theme_colors.background } },
         { Foreground = { Color = theme_colors.foreground } },
         { Text = date .. '  ' },
-        { Text = '󰉖 ' .. window:active_workspace() },
+        { Text = '󰉖 ' .. ' ' .. window:active_workspace() },
     }))
 end)
 
@@ -282,9 +285,9 @@ config.enable_tab_bar = true
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false -- look like native
 
-config.font = wezterm.font('Iosevka Custom', {
-    stretch = 'Expanded',
-})
+-- config.font = wezterm.font('Iosevka Custom', {
+--     stretch = 'Expanded',
+-- })
 
 -- Linux conf
 -- config.font_size = 14
@@ -292,7 +295,7 @@ config.font = wezterm.font('Iosevka Custom', {
 
 -- macOS conf
 config.font_size = 18
-config.line_height = 1.2
+config.line_height = 1.25
 
 -- keys
 config.send_composed_key_when_left_alt_is_pressed = true

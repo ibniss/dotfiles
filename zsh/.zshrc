@@ -35,7 +35,6 @@ alias zshconfig="nvim ~/.zshrc"
 alias vim="nvim"
 alias vi="nvim"
 
-export PATH="~/.cargo/bin:$PATH"
 
 # >>BREW START
 export PATH="/opt/homebrew/bin:$PATH"
@@ -52,9 +51,9 @@ source <(fzf --zsh)
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
+
+# cargo
+export PATH="~/.cargo/bin:$PATH"
 . "$HOME/.cargo/env"
 
 # dune
