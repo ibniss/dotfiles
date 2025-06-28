@@ -67,7 +67,7 @@ local base_project_path = home .. '/code'
 -- build up a list of projects to select from
 local projects_table = {
     -- special case for dotfiles which are not in code
-    { id = '~/dotfiles', label = 'dotfiles' },
+    -- { id = '~/dotfiles', label = 'dotfiles' },
 }
 
 -- get all folders within home/code folder
@@ -285,17 +285,14 @@ config.enable_tab_bar = true
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false -- look like native
 
--- config.font = wezterm.font('Iosevka Custom', {
---     stretch = 'Expanded',
--- })
 
 -- Linux conf
--- config.font_size = 14
--- config.line_height = 1
+config.font_size = 14
+config.line_height = 1
 
 -- macOS conf
-config.font_size = 18
-config.line_height = 1.25
+-- config.font_size = 18
+-- config.line_height = 1.25
 
 -- keys
 config.send_composed_key_when_left_alt_is_pressed = true
