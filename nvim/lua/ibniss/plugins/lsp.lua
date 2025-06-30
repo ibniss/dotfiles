@@ -114,16 +114,57 @@ return {
         config = function()
             local lspconfig = require('lspconfig')
 
+            local vtsls_inlay_hints = {
+                enumMemberValues = { enabled = true },
+                functionLikeReturnTypes = { enabled = true },
+                functionParameterTypes = { enabled = true },
+                parameterNames = { enabled = "all" },
+                parameterNameWhenArgumentMatchesNames = { enabled = true },
+                propertyDeclarationTypes = { enabled = true },
+                variableTypes = { enabled = true },
+                variableTypeWhenTypeMatchesNames = { enabled = true },
+            }
+
             -- server configurations
             -- true means default configuration
             local servers = {
                 lua_ls = true,
-                ts_ls = {
-                    root_dir = require('lspconfig').util.root_pattern('package.json'),
-                    single_file = false,
-                    server_capabilities = {
-                        documentFormattingProvider = false,
+                -- ts_ls = {
+                --     root_dir = require('lspconfig').util.root_pattern('package.json'),
+                --     single_file = false,
+                --     server_capabilities = {
+                --         documentFormattingProvider = false,
+                --     },
+                -- },
+                vtsls = {
+                    on_attach = function(client, bufnr)
+                        require('twoslash-queries').attach(client, bufnr)
+                    end,
+                    settings = {
+                        complete_function_calls = true,
+                        vtsls = {
+                            autoUseWorkspaceTsdk = true,
+                            experimental = {
+                                completion = {
+                                    enableServerSideFuzzyMatch = true,
+                                }
+                            }
+                        },
+                        typescript = {
+                            updateImportOnFileMove = { enabled = 'always' },
+                            suggest = {
+                                completeFunctionCalls = true,
+                            },
+                            tsserver = {
+                                maxTsServerMemory = 9216,
+                            },
+                            inlayHints = vtsls_inlay_hints,
+                        },
+                        javascript = {
+                            inlayHints = vtsls_inlay_hints,
+                        }
                     },
+
                 },
                 gopls = {
                     settings = {
@@ -180,7 +221,8 @@ return {
                 'rust_analyzer',
                 'basedpyright',
                 'eslint',
-                'gopls'
+                'gopls',
+                'vtsls',
             }
 
             -- run the mason installer
