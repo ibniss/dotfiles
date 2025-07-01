@@ -4,9 +4,9 @@ return {
         'hrsh7th/nvim-cmp',
         event = 'InsertEnter',
         dependencies = {
-            { 'hrsh7th/cmp-buffer' },   -- Optional
-            { 'hrsh7th/cmp-path' },     -- Optional
-            { 'hrsh7th/cmp-cmdline' },  -- Cmdline completions
+            { 'hrsh7th/cmp-buffer' }, -- Optional
+            { 'hrsh7th/cmp-path' }, -- Optional
+            { 'hrsh7th/cmp-cmdline' }, -- Cmdline completions
             { 'hrsh7th/cmp-nvim-lua' }, -- Optional
             { 'hrsh7th/cmp-nvim-lsp' },
             -- icons for completion items
@@ -30,8 +30,8 @@ return {
                     { name = 'path' },
                     { name = 'nvim_lsp' },
                     { name = 'nvim_lua' },
-                    { name = 'buffer',  keyword_length = 3 },
-                    { name = 'buffer',  keyword_length = 3 },
+                    { name = 'buffer', keyword_length = 3 },
+                    { name = 'buffer', keyword_length = 3 },
                 },
                 formatting = {
                     expandable_indicator = true,

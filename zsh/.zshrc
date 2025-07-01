@@ -121,6 +121,8 @@ fi
 alias vim="nvim"
 alias vi="nvim"
 alias v="nvim"
+export EDITOR=nvim
+export VISUAL=nvim
 
 
 alias ..="cd .."

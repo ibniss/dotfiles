@@ -17,5 +17,8 @@ return {
                 ['<CR>'] = 'actions.select',
             },
         })
+
+        -- open file system
+        vim.keymap.set('n', '<leader>pv', '<CMD>Oil<CR>', { desc = 'Open file system' })
     end,
 }

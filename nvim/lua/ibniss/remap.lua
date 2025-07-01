@@ -1,6 +1,4 @@
 vim.g.mapleader = ' '
--- open file system
-vim.keymap.set('n', '<leader>pv', '<CMD>Oil<CR>', { desc = 'Open file system' })
 
 -- this allow moving a block of code when highlighted up and down with J/K
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
@@ -40,7 +38,7 @@ vim.keymap.set('i', '<C-c>', '<Esc>')
 vim.keymap.set('n', 'Q', '<nop>')
 
 -- replace selected word
-vim.keymap.set('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+vim.keymap.set('n', '<leader>r', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
 -- chmod+x current file
 vim.keymap.set('n', '<leader>x', '<cmd>!chmod +x %<CR>', { silent = true })

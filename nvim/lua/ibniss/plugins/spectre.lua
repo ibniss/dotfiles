@@ -29,7 +29,7 @@ return {
         -- Spectre for word under cursor (visual)
         vim.keymap.set(
             'n',
-            '<leader>sw',
+            '<leader>Sw',
             function() require('spectre').open_visual({ select_word = true }) end,
             { desc = 'Search current word using Spectre' }
         )

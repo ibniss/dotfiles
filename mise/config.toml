@@ -1,6 +1,7 @@
 [tools]
 bun = "latest"
 just = "latest"
+go = "1.24.2"
 node = "20"
 pnpm = "9"
 python = "3.11"
