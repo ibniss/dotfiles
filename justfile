@@ -11,7 +11,7 @@ default:
     @just --list
 
 # Install all dotfiles
-install: install-nvim install-wezterm install-zsh install-antidote install-mise install-starship install-keyd-if-linux
+install: install-nvim install-wezterm install-zsh install-antidote install-mise install-starship install-opencode install-gitignore install-keyd-if-linux
     @echo "✅ All dotfiles installed successfully!"
     @echo "ℹ️  Restart your shell or run: source ~/.zshrc"
 
@@ -63,6 +63,19 @@ install-starship:
     @just backup-if-exists {{config_dir}}/starship.toml
     @just create-symlink {{dotfiles_dir}}/starship/starship.toml {{config_dir}}/starship.toml
 
+# Install opencode configuration
+install-opencode:
+    @echo "🤖 Installing opencode configuration..."
+    @just backup-if-exists {{config_dir}}/opencode/config.json
+    @mkdir -p {{config_dir}}/opencode
+    @just create-symlink {{dotfiles_dir}}/opencode/config.json {{config_dir}}/opencode/config.json
+
+# Install global gitignore
+install-gitignore:
+    @echo "🚫 Installing global gitignore..."
+    @just backup-if-exists {{env_var('HOME')}}/.gitignore_global
+    @just create-symlink {{dotfiles_dir}}/.gitignore_global {{env_var('HOME')}}/.gitignore_global
+
 # Install keyd configuration (Linux only)
 install-keyd:
     @if [ "{{os()}}" != "linux" ]; then \
@@ -81,7 +94,7 @@ install-keyd-if-linux:
     @if [ "{{os()}}" = "linux" ]; then just install-keyd; fi
 
 # Uninstall all dotfiles
-uninstall: uninstall-nvim uninstall-wezterm uninstall-zsh uninstall-antidote uninstall-mise uninstall-starship
+uninstall: uninstall-nvim uninstall-wezterm uninstall-zsh uninstall-antidote uninstall-mise uninstall-starship uninstall-opencode uninstall-gitignore
     @echo "✅ All dotfiles uninstalled"
 
 # Uninstall individual components
@@ -111,6 +124,14 @@ uninstall-starship:
     @echo "🗑️  Removing Starship symlink..."
     @rm -f {{config_dir}}/starship.toml
 
+uninstall-opencode:
+    @echo "🗑️  Removing opencode symlink..."
+    @rm -f {{config_dir}}/opencode/config.json
+
+uninstall-gitignore:
+    @echo "🗑️  Removing global gitignore symlink..."
+    @rm -f {{env_var('HOME')}}/.gitignore_global
+
 # Show installation status
 status:
     @echo "📊 Dotfiles Status"
@@ -130,6 +151,10 @@ status:
     @if [ -L "{{config_dir}}/mise/config.toml" ]; then echo "✅ installed"; else echo "❌ not installed"; fi
     @printf "  %-15s " "starship:"
     @if [ -L "{{config_dir}}/starship.toml" ]; then echo "✅ installed"; else echo "❌ not installed"; fi
+    @printf "  %-15s " "opencode:"
+    @if [ -L "{{config_dir}}/opencode/config.json" ]; then echo "✅ installed"; else echo "❌ not installed"; fi
+    @printf "  %-15s " "gitignore:"
+    @if [ -L "{{env_var('HOME')}}/.gitignore_global" ]; then echo "✅ installed"; else echo "❌ not installed"; fi
     @if [ "{{os()}}" = "linux" ]; then \
         printf "  %-15s " "keyd:"; \
         if [ -f "/etc/keyd/default.conf" ]; then echo "✅ installed"; else echo "❌ not installed"; fi; \
@@ -239,6 +264,8 @@ help:
     @echo "  just install-wezterm Install WezTerm config"
     @echo "  just install-mise    Install mise config"
     @echo "  just install-starship Install Starship config"
+    @echo "  just install-opencode Install opencode config"
+    @echo "  just install-gitignore Install global gitignore"
     @echo "  just install-keyd    Install keyd config (Linux only)"
     @echo ""
     @echo "Run 'just --list' to see all available recipes"
