@@ -143,7 +143,7 @@ if command -v eza >/dev/null 2>&1; then
     alias ls="eza"
     alias ll="eza -l"
     alias la="eza -a"
-    alias l="eza -C"
+    alias l="eza"
 else
     alias ls='ls --color=auto'
     alias ll="ls -la"
