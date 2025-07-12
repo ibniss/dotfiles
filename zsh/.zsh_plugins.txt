@@ -1,0 +1,13 @@
+# Antidote Plugin Bundle File
+# =============================================================================
+# This file defines the zsh plugins to be managed by antidote
+# Format: github-user/repo-name [options]
+# =============================================================================
+
+# Essential plugins
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting
+zsh-users/zsh-completions
+
+# Performance and utilities
+hlissner/zsh-autopair

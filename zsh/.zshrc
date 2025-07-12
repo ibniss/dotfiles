@@ -17,12 +17,17 @@ bindkey -e
 autoload -Uz compinit
 compinit
 
-# Load zsh plugins
-if [[ -f ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-    source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
-else
-    echo "zsh-autosuggestions not found"
+# Antidote plugin manager
+# Clone antidote if it doesn't exist
+if [[ ! -d ~/.antidote ]]; then
+    git clone --depth=1 https://github.com/mattmc3/antidote.git ~/.antidote
 fi
+
+# Initialize antidote
+source ~/.antidote/antidote.zsh
+
+# Load plugins from .zsh_plugins.txt
+antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
 
 
 # -----------------------------------------------------------------------------
@@ -39,11 +44,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
     # BREW END
 
-    # TODO: zsh-syntax-highlighting location with 'brew install zsh-syntax-highlighting'
-
 elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # Linux specific configurations
-    export PATH="$PATH:/opt/nvim/"
+    export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
     export PATH="$PATH:/opt/kmonad/"
     export PATH="$PATH:/home/ibniss/.opencode/bin"
 
@@ -52,11 +55,6 @@ elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
     key[Delete]="${terminfo[kdch1]}"
     [[ -n "${key[Delete]}" ]] && bindkey -- "${key[Delete]}" delete-char
     bindkey "^?" backward-delete-char
-
-    # ZSH syntax highlighting location with 'apt install zsh-syntax-highlighting'
-    if [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-        source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-    fi
 fi
 
 # -----------------------------------------------------------------------------
@@ -72,7 +70,6 @@ export PATH="~/.npm-global/bin:$PATH"
 # -----------------------------------------------------------------------------
 export XDG_CONFIG_HOME="$HOME/.config"
 export GIT_EDITOR="nvim"
-export VIM="nvim"
 
 # -----------------------------------------------------------------------------
 # Tool Initialization
@@ -179,12 +176,9 @@ setopt EXTENDED_GLOB
 setopt NO_BEEP
 
 # -----------------------------------------------------------------------------
-# Plugin Management (Manual)
+# Plugin Configuration
 # -----------------------------------------------------------------------------
 
-# Note: Removed oh-my-zsh in favor of starship + manual plugin loading
-# Add any additional zsh plugins here as needed
-
-# Example for adding more plugins:
-# [[ -f ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]] && \
-#     source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# Configure zsh-autosuggestions
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#666666"
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)

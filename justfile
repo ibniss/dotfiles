@@ -11,7 +11,7 @@ default:
     @just --list
 
 # Install all dotfiles
-install: install-nvim install-wezterm install-zsh install-mise install-starship install-keyd-if-linux
+install: install-nvim install-wezterm install-zsh install-antidote install-mise install-starship install-keyd-if-linux
     @echo "✅ All dotfiles installed successfully!"
     @echo "ℹ️  Restart your shell or run: source ~/.zshrc"
 
@@ -34,9 +34,21 @@ install-wezterm:
 install-zsh:
     @echo "🐚 Installing Zsh configuration..."
     @just backup-if-exists {{env_var('HOME')}}/.zshrc
+    @just backup-if-exists {{env_var('HOME')}}/.zsh_plugins.txt
     @just create-symlink {{dotfiles_dir}}/zsh/.zshrc {{env_var('HOME')}}/.zshrc
+    @just create-symlink {{dotfiles_dir}}/zsh/.zsh_plugins.txt {{env_var('HOME')}}/.zsh_plugins.txt
     @echo "⚠️  Remember to create ~/.env.local for your API keys"
     @echo "ℹ️  Template available at: {{dotfiles_dir}}/.env.local.example"
+
+# Install antidote plugin manager
+install-antidote:
+    @echo "📦 Installing antidote plugin manager..."
+    @if [ ! -d {{env_var('HOME')}}/.antidote ]; then \
+        git clone --depth=1 https://github.com/mattmc3/antidote.git {{env_var('HOME')}}/.antidote; \
+        echo "✅ antidote installed"; \
+    else \
+        echo "ℹ️  antidote already installed"; \
+    fi
 
 # Install mise configuration
 install-mise:
@@ -69,7 +81,7 @@ install-keyd-if-linux:
     @if [ "{{os()}}" = "linux" ]; then just install-keyd; fi
 
 # Uninstall all dotfiles
-uninstall: uninstall-nvim uninstall-wezterm uninstall-zsh uninstall-mise uninstall-starship
+uninstall: uninstall-nvim uninstall-wezterm uninstall-zsh uninstall-antidote uninstall-mise uninstall-starship
     @echo "✅ All dotfiles uninstalled"
 
 # Uninstall individual components
@@ -83,8 +95,13 @@ uninstall-wezterm:
     @if [ "{{os()}}" = "macos" ]; then rm -f {{env_var('HOME')}}/wezterm.sh; fi
 
 uninstall-zsh:
-    @echo "🗑️  Removing Zsh symlink..."
+    @echo "🗑️  Removing Zsh symlinks..."
     @rm -f {{env_var('HOME')}}/.zshrc
+    @rm -f {{env_var('HOME')}}/.zsh_plugins.txt
+
+uninstall-antidote:
+    @echo "🗑️  Removing antidote..."
+    @rm -rf {{env_var('HOME')}}/.antidote
 
 uninstall-mise:
     @echo "🗑️  Removing mise symlink..."
@@ -107,6 +124,8 @@ status:
     @if [ -L "{{config_dir}}/wezterm" ]; then echo "✅ installed"; else echo "❌ not installed"; fi
     @printf "  %-15s " "zsh:"
     @if [ -L "{{env_var('HOME')}}/.zshrc" ]; then echo "✅ installed"; else echo "❌ not installed"; fi
+    @printf "  %-15s " "antidote:"
+    @if [ -d "{{env_var('HOME')}}/.antidote" ]; then echo "✅ installed"; else echo "❌ not installed"; fi
     @printf "  %-15s " "mise:"
     @if [ -L "{{config_dir}}/mise/config.toml" ]; then echo "✅ installed"; else echo "❌ not installed"; fi
     @printf "  %-15s " "starship:"
@@ -154,6 +173,23 @@ clean:
     @find {{env_var('HOME')}} -maxdepth 1 -type l ! -exec test -e {} \; -print -delete 2>/dev/null || true
     @find {{config_dir}} -maxdepth 2 -type l ! -exec test -e {} \; -print -delete 2>/dev/null || true
     @echo "✅ Cleaned broken symlinks"
+
+# Update antidote and plugins
+update-plugins:
+    @echo "🔄 Updating antidote and plugins..."
+    @if [ -d {{env_var('HOME')}}/.antidote ]; then \
+        cd {{env_var('HOME')}}/.antidote && git pull; \
+        echo "✅ antidote updated"; \
+    else \
+        echo "❌ antidote not installed"; \
+        exit 1; \
+    fi
+    @if command -v zsh >/dev/null 2>&1; then \
+        zsh -c "source ~/.antidote/antidote.zsh && antidote update"; \
+        echo "✅ plugins updated"; \
+    else \
+        echo "❌ zsh not available"; \
+    fi
 
 # Show backup restoration info
 backup-info:
