@@ -100,9 +100,10 @@ fi
 
 if command -v fzf >/dev/null 2>&1; then
     source <(fzf --zsh)
+    # FZF colors to match your theme
+    export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
 fi
 
-# TODO: required
 # Starship prompt
 if command -v starship >/dev/null 2>&1; then
     eval "$(starship init zsh)"
@@ -110,12 +111,11 @@ else
     echo "!!! Starship not found"
 fi
 
-# TODO: consolidate on .config location, make sure it's consistent with our makefile
 # WezTerm integration
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    [[ -f ~/wezterm.sh ]] && source ~/wezterm.sh
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    [[ -f ~/.config/wezterm/wezterm.sh ]] && source ~/.config/wezterm/wezterm.sh
+[[ -f ~/.config/wezterm/wezterm.sh ]] && source ~/.config/wezterm/wezterm.sh
+
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
 fi
 
 # -----------------------------------------------------------------------------
@@ -123,10 +123,35 @@ fi
 # -----------------------------------------------------------------------------
 alias vim="nvim"
 alias vi="nvim"
+alias v="nvim"
 
-alias ll="ls -la"
-alias la="ls -A"
-alias l="ls -CF"
+
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+
+# Replacement tools
+if command -v bat >/dev/null 2>&1; then
+    alias cat="bat"
+    alias less="bat"
+elif command -v batcat >/dev/null 2>&1; then
+    alias cat="batcat"
+    alias less="batcat"
+fi
+
+if command -v eza >/dev/null 2>&1; then
+    alias ls="eza"
+    alias ll="eza -l"
+    alias la="eza -a"
+    alias l="eza -C"
+else
+    alias ls='ls --color=auto'
+    alias ll="ls -la"
+    alias la="ls -A"
+    alias l="ls -CF"
+fi
+
 
 alias zshconfig="nvim ~/.zshrc"
 

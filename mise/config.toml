@@ -1,4 +1,6 @@
 [tools]
+bun = "latest"
+just = "latest"
 node = "20"
 pnpm = "9"
 python = "3.11"
