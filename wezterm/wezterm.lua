@@ -4,6 +4,20 @@ local wezterm = require('wezterm')
 -- This will hold the configuration.
 local config = wezterm.config_builder()
 
+-- Platform detection
+local function get_os()
+    local target = wezterm.target_triple
+    if target:find('apple') then
+        return 'macos'
+    elseif target:find('linux') then
+        return 'linux'
+    elseif target:find('windows') then
+        return 'windows'
+    else
+        return 'unknown'
+    end
+end
+
 local direction_keys = {
     h = 'Left',
     j = 'Down',
@@ -62,13 +76,24 @@ local function split_nav_move(key)
 end
 
 local home = wezterm.home_dir
-local base_project_path = home .. '/code'
+
+local function get_base_project_path()
+    return home .. '/code'
+end
+
+local function path_exists(path)
+    return os.execute('ls ' .. path) == 0
+end
+
+local base_project_path = get_base_project_path()
 
 -- build up a list of projects to select from
-local projects_table = {
-    -- special case for dotfiles which are not in code
-    -- { id = '~/dotfiles', label = 'dotfiles' },
-}
+local projects_table = {}
+
+-- add ~/dotfiles if exists
+if path_exists(home .. '/dotfiles') then
+    table.insert(projects_table, { id = '~/dotfiles', label = 'dotfiles' })
+end
 
 -- get all folders within home/code folder
 -- split the string into a table
@@ -87,26 +112,51 @@ config.max_fps = 180
 --- tells nvim and others about the terminal capabilities
 config.term = 'wezterm'
 
--- This is where you actually apply your config choices
-
 -- Make Ctrl+A the leader key
 config.leader = { key = 'a', mods = 'CTRL', timeout_milliseconds = 1000 }
 
+-- Platform-specific keybindings
+local word_nav_keys = {}
+local os_type = get_os()
+if os_type == 'macos' then
+    -- macOS uses Option key for word navigation
+    word_nav_keys = {
+        {
+            key = 'LeftArrow',
+            mods = 'OPT',
+            action = wezterm.action.SendKey({
+                key = 'b',
+                mods = 'ALT',
+            }),
+        },
+        {
+            key = 'RightArrow',
+            mods = 'OPT',
+            action = wezterm.action.SendKey({ key = 'f', mods = 'ALT' }),
+        },
+    }
+else
+    -- Linux/Windows use Ctrl for word navigation
+    word_nav_keys = {
+        {
+            key = 'LeftArrow',
+            mods = 'CTRL',
+            action = wezterm.action.SendKey({
+                key = 'b',
+                mods = 'ALT',
+            }),
+        },
+        {
+            key = 'RightArrow',
+            mods = 'CTRL',
+            action = wezterm.action.SendKey({ key = 'f', mods = 'ALT' }),
+        },
+    }
+end
+
 config.keys = {
-    -- move words left/right
-    {
-        key = 'LeftArrow',
-        mods = 'OPT',
-        action = wezterm.action.SendKey({
-            key = 'b',
-            mods = 'ALT',
-        }),
-    },
-    {
-        key = 'RightArrow',
-        mods = 'OPT',
-        action = wezterm.action.SendKey({ key = 'f', mods = 'ALT' }),
-    },
+    -- Platform-specific word navigation
+    table.unpack(word_nav_keys),
     {
         mods = 'LEADER | SHIFT',
         key = '"',
@@ -252,7 +302,11 @@ end
 config.audible_bell = 'Disabled'
 config.color_scheme = scheme_for_appearance(get_appearance())
 config.window_decorations = 'RESIZE'
-config.native_macos_fullscreen_mode = true
+
+-- Platform-specific window settings
+if os_type == 'macos' then
+    config.native_macos_fullscreen_mode = true
+end
 
 -- keep status bar up to date (polls every few seconds)
 wezterm.on('update-right-status', function(window, pane)
@@ -285,14 +339,14 @@ config.enable_tab_bar = true
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false -- look like native
 
-
--- Linux conf
-config.font_size = 14
-config.line_height = 1
-
--- macOS conf
--- config.font_size = 18
--- config.line_height = 1.25
+-- Platform-specific configuration
+if os_type == 'macos' then
+    config.font_size = 18
+    config.line_height = 1.25
+elseif os_type == 'linux' then
+    config.font_size = 14
+    config.line_height = 1
+end
 
 -- keys
 config.send_composed_key_when_left_alt_is_pressed = true
