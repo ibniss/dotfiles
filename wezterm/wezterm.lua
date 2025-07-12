@@ -77,12 +77,11 @@ end
 
 local home = wezterm.home_dir
 
-local function get_base_project_path()
-    return home .. '/code'
-end
+local function get_base_project_path() return home .. '/code' end
 
 local function path_exists(path)
-    return os.execute('ls ' .. path) == 0
+    local ret = os.execute('ls ' .. path)
+    return ret == 0 or ret == true
 end
 
 local base_project_path = get_base_project_path()
@@ -304,9 +303,7 @@ config.color_scheme = scheme_for_appearance(get_appearance())
 config.window_decorations = 'RESIZE'
 
 -- Platform-specific window settings
-if os_type == 'macos' then
-    config.native_macos_fullscreen_mode = true
-end
+if os_type == 'macos' then config.native_macos_fullscreen_mode = true end
 
 -- keep status bar up to date (polls every few seconds)
 wezterm.on('update-right-status', function(window, pane)
