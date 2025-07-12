@@ -1,0 +1,5 @@
+export PATH="$PATH:/$HOME/.local/bin"
+export XDG_CONFIG_HOME=$HOME/.config
+export GIT_EDITOR=$VIM
+source ~/.config/wezterm/wezterm.sh
+eval "$($HOME/.local/bin/mise activate zsh --shims)"
