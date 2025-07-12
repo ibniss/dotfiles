@@ -10,7 +10,7 @@ link-wezterm:
 
 link-zsh:
 	rm -f ~/.zshrc
-	ln -s $(PWD)/zsh/.zshrc.linux ~/.zshrc
+	ln -s $(PWD)/zsh/.zshrc ~/.zshrc
 	rm -f ~/.zprofile
 	ln -s $(PWD)/zsh/.zsh_profile ~/.zprofile
 
