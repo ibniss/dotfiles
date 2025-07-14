@@ -115,47 +115,23 @@ config.term = 'wezterm'
 config.leader = { key = 'a', mods = 'CTRL', timeout_milliseconds = 1000 }
 
 -- Platform-specific keybindings
-local word_nav_keys = {}
 local os_type = get_os()
-if os_type == 'macos' then
-    -- macOS uses Option key for word navigation
-    word_nav_keys = {
-        {
-            key = 'LeftArrow',
-            mods = 'OPT',
-            action = wezterm.action.SendKey({
-                key = 'b',
-                mods = 'ALT',
-            }),
-        },
-        {
-            key = 'RightArrow',
-            mods = 'OPT',
-            action = wezterm.action.SendKey({ key = 'f', mods = 'ALT' }),
-        },
-    }
-else
-    -- Linux/Windows use Ctrl for word navigation
-    word_nav_keys = {
-        {
-            key = 'LeftArrow',
-            mods = 'CTRL',
-            action = wezterm.action.SendKey({
-                key = 'b',
-                mods = 'ALT',
-            }),
-        },
-        {
-            key = 'RightArrow',
-            mods = 'CTRL',
-            action = wezterm.action.SendKey({ key = 'f', mods = 'ALT' }),
-        },
-    }
-end
 
 config.keys = {
-    -- Platform-specific word navigation
-    table.unpack(word_nav_keys),
+    -- todo: maybe fix for linux
+    {
+        key = 'LeftArrow',
+        mods = 'OPT',
+        action = wezterm.action.SendKey({
+            key = 'b',
+            mods = 'ALT',
+        }),
+    },
+    {
+        key = 'RightArrow',
+        mods = 'OPT',
+        action = wezterm.action.SendKey({ key = 'f', mods = 'ALT' }),
+    },
     {
         mods = 'LEADER | SHIFT',
         key = '"',
@@ -346,7 +322,7 @@ elseif os_type == 'linux' then
 end
 
 -- keys
-config.send_composed_key_when_left_alt_is_pressed = false
-config.send_composed_key_when_right_alt_is_pressed = false
+config.send_composed_key_when_left_alt_is_pressed = true
+config.use_ime = false
 
 return config
