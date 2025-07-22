@@ -2,4 +2,11 @@ export PATH="$PATH:/$HOME/.local/bin"
 export XDG_CONFIG_HOME=$HOME/.config
 export GIT_EDITOR=$VIM
 source ~/.config/wezterm/wezterm.sh
+
+# Load local environment variables (gitignored)
+[[ -f "$HOME/.env.local" ]] && source "$HOME/.env.local"
+
+# Load project-specific environment variables
+[[ -f ".env.local" ]] && source ".env.local"
+
 eval "$($HOME/.local/bin/mise activate zsh --shims)"
