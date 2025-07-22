@@ -1,6 +1,7 @@
 # =============================================================================
 # Unified ZSH Configuration with Starship
 # =============================================================================
+# zmodload zsh/zprof
 
 # -----------------------------------------------------------------------------
 # History and Basic ZSH Settings
@@ -13,9 +14,13 @@ setopt HIST_IGNORE_SPACE
 setopt SHARE_HISTORY
 bindkey -e
 
-# Completion system
+# Smarter completion initialization
 autoload -Uz compinit
-compinit
+if [ "$(date +'%j')" != "$(stat -f '%Sm' -t '%j' ~/.zcompdump 2>/dev/null)" ]; then
+    compinit
+else
+    compinit -C
+fi
 
 # Antidote plugin manager
 # Clone antidote if it doesn't exist
@@ -191,3 +196,4 @@ if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "/$HOME/google-cloud-sdk
 # The next line enables shell command completion for gcloud.
 if [ -f "/$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "/$HOME/google-cloud-sdk/completion.zsh.inc"; fi
 
+# zprof
