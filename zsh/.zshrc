@@ -129,6 +129,8 @@ alias v="nvim"
 export EDITOR=nvim
 export VISUAL=nvim
 
+# git
+alias gdca="git diff --cached"
 
 alias ..="cd .."
 alias ...="cd ../.."
