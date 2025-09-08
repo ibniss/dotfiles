@@ -96,10 +96,15 @@ return {
                 -- used for completion, annotations and signatures of Neovim apis
                 'folke/lazydev.nvim',
                 ft = 'lua',
+                dependencies = {
+                    { 'gonstoll/wezterm-types', lazy = true },
+                },
                 opts = {
                     library = {
                         -- Load luvit types when the `vim.uv` word is found
                         { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+                        -- Load wezterm types
+                        { path = 'wezterm-types', mods = { 'wezterm' } },
                     },
                 },
             },
@@ -118,7 +123,7 @@ return {
                 enumMemberValues = { enabled = true },
                 functionLikeReturnTypes = { enabled = true },
                 functionParameterTypes = { enabled = true },
-                parameterNames = { enabled = "all" },
+                parameterNames = { enabled = 'all' },
                 parameterNameWhenArgumentMatchesNames = { enabled = true },
                 propertyDeclarationTypes = { enabled = true },
                 variableTypes = { enabled = true },
@@ -147,8 +152,8 @@ return {
                             experimental = {
                                 completion = {
                                     enableServerSideFuzzyMatch = true,
-                                }
-                            }
+                                },
+                            },
                         },
                         typescript = {
                             updateImportOnFileMove = { enabled = 'always' },
@@ -162,9 +167,8 @@ return {
                         },
                         javascript = {
                             inlayHints = vtsls_inlay_hints,
-                        }
+                        },
                     },
-
                 },
                 gopls = {
                     settings = {
