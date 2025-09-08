@@ -80,8 +80,14 @@ local home = wezterm.home_dir
 local function get_base_project_path() return home .. '/code' end
 
 local function path_exists(path)
-    local ret = os.execute('ls ' .. path)
-    return ret == 0 or ret == true
+    local f = io.open(path, 'r')
+
+    if f then
+        f:close()
+        return true
+    end
+
+    return false
 end
 
 local base_project_path = get_base_project_path()
@@ -316,9 +322,33 @@ table.insert(config.hyperlink_rules, {
     format = 'file://$0',
 })
 
+--- Resolve a path to a file
+--- @param nvim_pane Pane
+--- @param clicked_pane Pane
+--- @param path string
+local function resolve_path(nvim_pane, clicked_pane, path)
+    local cwd_uri = clicked_pane:get_current_working_dir() --[[@as Url]]
+    local cwd = cwd_uri.path
+
+    local nvim_cwd_uri = nvim_pane:get_current_working_dir() --[[@as Url]]
+    local nvim_cwd = nvim_cwd_uri.path
+
+    -- candidate 1: relative to the emitter's cwd
+    local cand1 = cwd .. '/' .. path
+
+    if path_exists(cand1) then return cand1 end
+
+    -- candidate 2: relative to the nvim's cwd (nvim root, repo root)
+    local cand2 = nvim_cwd .. '/' .. path
+    if path_exists(cand2) then return cand2 end
+
+    -- fallback: as-is
+    return path
+end
+
 -- hijack the open-uri event for hyperlinks in the file:// scheme (as above)
 -- This looks for the first pane with a nvim instance and opens the file:line in it
-wezterm.on('open-uri', function(window, _pane, uri)
+wezterm.on('open-uri', function(window, clicked_pane, uri)
     local path, line = string.match(uri, 'file://(.*):(%d+)$')
     if path and line then
         local tabs = window:mux_window():tabs_with_info()
@@ -326,15 +356,20 @@ wezterm.on('open-uri', function(window, _pane, uri)
             local panes = tab_with_info.tab:panes_with_info()
             for _, pane_with_info in ipairs(panes) do
                 local pane = pane_with_info.pane
-                --- @type string
                 local process_name = pane:get_foreground_process_name()
                 local is_nvim = process_name:match('nvim$')
                 if is_nvim then
+                    local abs_path = path
+
+                    if not path:match('^/') then
+                        abs_path = resolve_path(pane, clicked_pane, path)
+                    end
+
                     -- send keys -> Escape ":e $file" C-m "${line}G"
                     window:perform_action({
                         SendKey = { key = 'Escape' },
                     }, pane)
-                    pane:send_text(string.format(':e %s', path))
+                    pane:send_text(string.format(':e %s', abs_path))
                     window:perform_action({
                         SendKey = { key = 'Enter' },
                     }, pane)
