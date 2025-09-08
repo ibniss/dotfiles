@@ -1,5 +1,5 @@
 -- Pull in the wezterm API
-local wezterm = require('wezterm')
+local wezterm = require('wezterm') --[[@as Wezterm]]
 
 -- This will hold the configuration.
 local config = wezterm.config_builder()
@@ -197,6 +197,12 @@ config.keys = {
         mods = 'LEADER|CTRL',
         action = wezterm.action.SendKey({ key = 'a', mods = 'CTRL' }),
     },
+    -- C-A D -> debug
+    {
+        key = 'd',
+        mods = 'LEADER',
+        action = wezterm.action.ShowDebugOverlay,
+    },
     -- workspaces (~sessions in tmux)
     {
         key = 's',
@@ -302,9 +308,55 @@ wezterm.on('update-right-status', function(window, pane)
     }))
 end)
 
+-- render file:line number strings as links
+-- matches e.g. foo.ex:12, src/main.js:42, lib/some-deep/path/file_name-123.rb:999
+config.hyperlink_rules = wezterm.default_hyperlink_rules()
+table.insert(config.hyperlink_rules, {
+    regex = [[([\w\./\-_]+:\d+)]],
+    format = 'file://$0',
+})
+
+-- hijack the open-uri event for hyperlinks in the file:// scheme (as above)
+-- This looks for the first pane with a nvim instance and opens the file:line in it
+wezterm.on('open-uri', function(window, _pane, uri)
+    local path, line = string.match(uri, 'file://(.*):(%d+)$')
+    if path and line then
+        local tabs = window:mux_window():tabs_with_info()
+        for _, tab_with_info in ipairs(tabs) do
+            local panes = tab_with_info.tab:panes_with_info()
+            for _, pane_with_info in ipairs(panes) do
+                local pane = pane_with_info.pane
+                --- @type string
+                local process_name = pane:get_foreground_process_name()
+                local is_nvim = process_name:match('nvim$')
+                if is_nvim then
+                    -- send keys -> Escape ":e $file" C-m "${line}G"
+                    window:perform_action({
+                        SendKey = { key = 'Escape' },
+                    }, pane)
+                    pane:send_text(string.format(':e %s', path))
+                    window:perform_action({
+                        SendKey = { key = 'Enter' },
+                    }, pane)
+                    pane:send_text(string.format('%sG', line))
+                    -- focus the pane
+                    pane:activate()
+
+                    break
+                end
+            end
+        end
+
+        -- prevent default
+        return false
+    end
+end)
+
 config.window_padding = {
     top = '0.5cell',
     bottom = '0.0cell',
+    left = '0.0cell',
+    right = '0.0cell',
 }
 
 -- setup stuff to behave like tmux
@@ -320,6 +372,8 @@ elseif os_type == 'linux' then
     config.font_size = 14
     config.line_height = 1
 end
+
+-- zsh/.zshrc
 
 -- keys
 config.send_composed_key_when_left_alt_is_pressed = true
