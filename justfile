@@ -58,7 +58,6 @@ install-mise: (_stow "mise")
 install-starship: (_stow "starship")
 install-opencode: (_stow "opencode")
 install-git: (_stow "git")
-install-stylua: (_stow "stylua")
 
 uninstall-nvim: (_unstow "nvim")
 uninstall-wezterm: (_unstow "wezterm")
@@ -67,7 +66,6 @@ uninstall-mise: (_unstow "mise")
 uninstall-starship: (_unstow "starship")
 uninstall-opencode: (_unstow "opencode")
 uninstall-git: (_unstow "git")
-uninstall-stylua: (_unstow "stylua")
 
 # Special: Install antidote plugin manager
 [private]
@@ -259,7 +257,6 @@ help:
     @echo "  just install-starship Install Starship config"
     @echo "  just install-opencode Install opencode config"
     @echo "  just install-git     Install git config"
-    @echo "  just install-stylua  Install stylua config"
     @echo "  just install-keyd    Install keyd config (Linux only)"
     @echo ""
     @echo "Stow packages: {{stow_packages}}"
