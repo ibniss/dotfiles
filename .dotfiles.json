@@ -1,0 +1,54 @@
+{
+  "$schema": "./dotfiles.schema.json",
+  "packages": {
+    "nvim": {
+      "type": "stow",
+      "paths": [".config/nvim"]
+    },
+    "wezterm": {
+      "type": "stow",
+      "paths": [".config/wezterm"]
+    },
+    "zsh": {
+      "type": "stow",
+      "paths": [".zshrc", ".zsh_plugins.txt", ".zsh_profile"]
+    },
+    "mise": {
+      "type": "stow",
+      "paths": [".config/mise/config.toml"]
+    },
+    "starship": {
+      "type": "stow",
+      "paths": [".config/starship.toml"]
+    },
+    "opencode": {
+      "type": "stow",
+      "paths": [".config/opencode/config.json"]
+    },
+    "git": {
+      "type": "stow",
+      "paths": [".gitconfig", ".config/git/ignore"]
+    },
+    "antidote": {
+      "type": "special",
+      "paths": [],
+      "install": "git clone --depth=1 https://github.com/mattmc3/antidote.git $HOME/.antidote",
+      "comment": "antidote is cloned as a directory, not stowed, so no paths to clean"
+    },
+    "keyd": {
+      "type": "special",
+      "paths": ["/etc/keyd/default.conf"],
+      "install": "sudo cp keyd/default.conf /etc/keyd/default.conf",
+      "platforms": ["linux"]
+    }
+  },
+  "dependencies": {
+    "required": ["git", "stow", "jq"],
+    "bootstrap": ["stow", "just", "mise", "jq"],
+    "optional": {
+      "core": ["nvim", "starship", "mise", "fzf", "just"],
+      "dev": ["cargo", "dune"],
+      "enhancements": ["zoxide", "bat", "eza"]
+    }
+  }
+}
