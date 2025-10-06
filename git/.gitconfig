@@ -1,0 +1,33 @@
+[core]
+	pager = delta --features "$(defaults read -globalDomain AppleInterfaceStyle &> /dev/null && echo dark-mode || echo light-mode)"
+	excludesFile = ~/.config/git/ignore
+
+[delta "dark-mode"]
+	navigate = true
+	line-numbers = true
+	light = false
+	syntax-theme = Coldark-Dark
+
+[delta "light-mode"]
+	navigate = true
+	line-numbers = true
+	light = true
+	syntax-theme = GitHub
+
+[interactive]
+	diffFilter = delta --color-only
+
+[rerere]
+	enabled = true
+
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+
+[push]
+	autoSetupRemote = true
+
+[include]
+	path = ~/.gitconfig.local
