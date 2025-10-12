@@ -14,12 +14,12 @@ default:
     @just --list
 
 # Install all dotfiles using stow
-install: _install-antidote _install-all-stow _install-keyd-if-linux
+install: _install-all-stow _install-keyd-if-linux
     @echo "✅ All dotfiles installed successfully!"
-    @echo "ℹ️  Restart your shell or run: source ~/.zshrc"
+    @echo "ℹ️  Restart your shell"
 
 # Uninstall all dotfiles
-uninstall: _uninstall-all-stow _uninstall-antidote
+uninstall: _uninstall-all-stow
     @echo "✅ All dotfiles uninstalled"
 
 # Install or uninstall a specific package (usage: just pkg nvim install)
@@ -53,7 +53,6 @@ _uninstall-all-stow:
 # Install/uninstall recipes for each package
 install-nvim: (_stow "nvim")
 install-wezterm: (_stow "wezterm")
-install-zsh: (_stow "zsh")
 install-fish: (_stow "fish")
 install-mise: (_stow "mise")
 install-starship: (_stow "starship")
@@ -62,33 +61,11 @@ install-git: (_stow "git")
 
 uninstall-nvim: (_unstow "nvim")
 uninstall-wezterm: (_unstow "wezterm")
-uninstall-zsh: (_unstow "zsh")
 uninstall-fish: (_unstow "fish")
 uninstall-mise: (_unstow "mise")
 uninstall-starship: (_unstow "starship")
 uninstall-opencode: (_unstow "opencode")
 uninstall-git: (_unstow "git")
-
-# Special: Install antidote plugin manager
-[private]
-_install-antidote:
-    @echo "📦 Installing antidote plugin manager..."
-    @if [ ! -d {{home_dir}}/.antidote ]; then \
-        git clone --depth=1 https://github.com/mattmc3/antidote.git {{home_dir}}/.antidote; \
-        echo "✅ antidote installed"; \
-    else \
-        echo "ℹ️  antidote already installed"; \
-    fi
-
-install-antidote: _install-antidote
-
-# Special: Uninstall antidote
-[private]
-_uninstall-antidote:
-    @echo "🗑️  Removing antidote..."
-    @rm -rf {{home_dir}}/.antidote
-
-uninstall-antidote: _uninstall-antidote
 
 # Special: Install keyd (Linux only, uses cp not stow)
 install-keyd:
@@ -117,7 +94,6 @@ status:
     @for pkg in {{stow_packages}}; do just _check-package $pkg; done
     @echo ""
     @echo "Special packages:"
-    @just _check-special antidote "{{home_dir}}/.antidote" dir
     @if [ "{{os()}}" = "linux" ]; then just _check-special keyd "/etc/keyd/default.conf" file; fi
 
 # Check if a stow package is installed
@@ -143,7 +119,7 @@ _check-package package:
         echo "❌ not installed"
     fi
 
-# Check special packages (antidote, keyd)
+# Check special packages (keyd)
 [private]
 _check-special name path type:
     #!/usr/bin/env bash
@@ -208,23 +184,6 @@ clean:
     @find {{home_dir}}/.config -maxdepth 2 -type l ! -exec test -e {} \; -print -delete 2>/dev/null || true
     @echo "✅ Cleaned broken symlinks"
 
-# Update antidote and plugins
-update-plugins:
-    @echo "🔄 Updating antidote and plugins..."
-    @if [ -d {{home_dir}}/.antidote ]; then \
-        cd {{home_dir}}/.antidote && git pull; \
-        echo "✅ antidote updated"; \
-    else \
-        echo "❌ antidote not installed"; \
-        exit 1; \
-    fi
-    @if command -v zsh >/dev/null 2>&1; then \
-        zsh -c "source ~/.antidote/antidote.zsh && antidote update"; \
-        echo "✅ plugins updated"; \
-    else \
-        echo "❌ zsh not available"; \
-    fi
-
 # Restow all packages (useful after updating dotfiles repo)
 restow:
     @echo "🔄 Restowing all packages..."
@@ -252,7 +211,7 @@ help:
     @echo ""
     @echo "Individual installs:"
     @echo "  just install-nvim    Install Neovim config"
-    @echo "  just install-zsh     Install Zsh config"
+    @echo "  just install-fish     Install fish config"
     @echo "  just install-wezterm Install WezTerm config"
     @echo "  just install-mise    Install mise config"
     @echo "  just install-starship Install Starship config"
