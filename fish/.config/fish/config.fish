@@ -11,7 +11,7 @@ end
 # -----------------------------------------------------------------------------
 fish_add_path "$HOME/bin" "/usr/local/bin" "/usr/bin" "/bin"
 fish_add_path "/usr/local/sbin" "/usr/sbin" "/sbin"
-fish_add_path "~/.npm-global/bin:$PATH"
+fish_add_path "~/.npm-global/bin"
 
 # -----------------------------------------------------------------------------
 # XDG and Environment Variables
