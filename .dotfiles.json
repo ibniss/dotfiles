@@ -13,6 +13,10 @@
       "type": "stow",
       "paths": [".zshrc", ".zsh_plugins.txt", ".zsh_profile"]
     },
+    "fish": {
+      "type": "stow",
+      "paths": [".config/fish"]
+    },
     "mise": {
       "type": "stow",
       "paths": [".config/mise/config.toml"]
