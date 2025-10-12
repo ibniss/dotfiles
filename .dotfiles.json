@@ -62,6 +62,7 @@
       "jq"
     ],
     "bootstrap": [
+      "fish",
       "stow",
       "just",
       "mise",
