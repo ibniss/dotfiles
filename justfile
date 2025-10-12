@@ -170,7 +170,6 @@ check-deps:
     @just _check-cmd just "⚠️"
     @echo ""
     @echo "Development:"
-    @just _check-cmd cargo "⚠️"
     @just _check-cmd dune "⚠️"
     @echo ""
     @echo "Optional:"
