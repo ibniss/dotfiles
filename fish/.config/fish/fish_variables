@@ -8,8 +8,8 @@ SETUVAR _fisher_plugins:jorgebucaran/fisher\x1ejorgebucaran/hydro\x1evitallium/t
 SETUVAR _fisher_upgraded_to_4_4:\x1d
 SETUVAR _fisher_vitallium_2F_tokyonight_2D_fish_files:\x7e/\x2econfig/fish/themes/TokyoNight\x20Day\x2etheme\x1e\x7e/\x2econfig/fish/themes/TokyoNight\x20Moon\x2etheme\x1e\x7e/\x2econfig/fish/themes/TokyoNight\x20Night\x2etheme\x1e\x7e/\x2econfig/fish/themes/TokyoNight\x20Storm\x2etheme
 SETUVAR _hydro_git_19887:main\x20\u2022\x20\x20
-SETUVAR _hydro_git_85750:DO\x2d8057\x2dadd\x2dability\x2dto\x2dqueue\x2dmessages\x2dto\x2ddara\x2dai\x2dso\x2dusers\x2dcan\x2dmore\x2dquickly\x2dreview\x2da\x2ddashboard\x20\u2022\x20\x20
-SETUVAR _hydro_git_98939:main\x20\u2022\x20\x20
+SETUVAR _hydro_git_30986:main\x1b\x5b35m\x2a\x1b\x5bm\x20\x20
+SETUVAR _hydro_git_33895:DO\x2d8057\x2dadd\x2dability\x2dto\x2dqueue\x2dmessages\x2dto\x2ddara\x2dai\x2dso\x2dusers\x2dcan\x2dmore\x2dquickly\x2dreview\x2da\x2ddashboard\x1b\x5b35m\x2a\x1b\x5bm\x20\x20
 SETUVAR fish_color_autosuggestion:636da6
 SETUVAR fish_color_cancel:\x1d
 SETUVAR fish_color_command:86e1fc
