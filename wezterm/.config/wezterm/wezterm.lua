@@ -284,7 +284,7 @@ wezterm.on("format-tab-title", function(tab, tabs)
   -- get last part of the active process's path name, e.g. /opt/bin/nvim -> nvim
   local pname = tab.active_pane.foreground_process_name
   pname = string.match(pname, "([^/]+)$")
-  if #pname > 0 then
+  if pname and #pname > 0 then
     title = pname
   end
 
@@ -342,7 +342,7 @@ end)
 -- matches e.g. foo.ex:12, src/main.js:42, lib/some-deep/path/file_name-123.rb:999
 config.hyperlink_rules = wezterm.default_hyperlink_rules()
 table.insert(config.hyperlink_rules, {
-  regex = [[([\w\./\-_]+:\d+)]],
+  regex = [[([\w\./\-_]+:\d+(?::\d+)*)]],
   format = "file://$0",
 })
 
@@ -366,6 +366,7 @@ local function resolve_path(nvim_pane, clicked_pane, path)
 
   -- candidate 2: relative to the nvim's cwd (nvim root, repo root)
   local cand2 = nvim_cwd .. "/" .. path
+
   if path_exists(cand2) then
     return cand2
   end
@@ -377,7 +378,8 @@ end
 -- hijack the open-uri event for hyperlinks in the file:// scheme (as above)
 -- This looks for the first pane with a nvim instance and opens the file:line in it
 wezterm.on("open-uri", function(window, clicked_pane, uri)
-  local path, line = string.match(uri, "file://(.*):(%d+)$")
+  local path, line = string.match(uri, "^file://(.-):(%d+):?%d*$")
+
   if path and line then
     local tabs = window:mux_window():tabs_with_info()
     for _, tab_with_info in ipairs(tabs) do
