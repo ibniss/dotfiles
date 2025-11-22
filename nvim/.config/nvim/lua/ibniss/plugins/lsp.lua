@@ -188,7 +188,7 @@ return {
                 rust_analyzer = true,
                 basedpyright = true,
                 eslint = true,
-                biome = true,
+                -- biome = true,
                 jsonls = true,
                 ocamllsp = {
                     manual_install = true,
