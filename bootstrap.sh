@@ -17,7 +17,11 @@ CONFIG_FILE=".dotfiles.json"
 # First, install jq if needed (we need it to read the config)
 if ! command -v jq >/dev/null 2>&1; then
     echo "📦 Installing jq (needed to read config)..."
-    brew install jq
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install jq
+    else
+        sudo apt-get install jq -y
+    fi
 fi
 
 # Read bootstrap dependencies from config
@@ -25,7 +29,11 @@ echo "📦 Installing required tools..."
 while IFS= read -r tool; do
     if ! command -v "$tool" >/dev/null 2>&1; then
         echo "  Installing $tool..."
-        brew install "$tool"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            brew install "$tool"
+        else
+            sudo apt-get install "$tool" -y
+        fi
     else
         echo "  ✅ $tool already installed"
     fi
