@@ -18,6 +18,7 @@ SETUVAR _hydro_git_33047:DO\x2d8169\x2dupgrade\x2ddara\x2dminimum\x2dpython\x2dv
 SETUVAR _hydro_git_79062:main\x20
 SETUVAR _hydro_git_80401:main\x1b\x5b35m\x2a\x1b\x5bm\x20
 SETUVAR _hydro_git_81874:main\x1b\x5b35m\x2a\x1b\x5bm\x20
+SETUVAR _hydro_git_8473:main\x1b\x5b35m\x2a\x1b\x28B\x1b\x5bm\x20\x1b\x5b36m\u2191\x1b\x28B\x1b\x5bm2\x20
 SETUVAR _hydro_git_92985:DO\x2d8150\x2dfigure\x2dout\x2dci\x2dissues\x2din\x2dagents\x2dtoolkit\x1b\x5b35m\x2a\x1b\x5bm\x20
 SETUVAR _hydro_git_96117:main\x1b\x5b35m\x2a\x1b\x5bm\x20
 SETUVAR fish_color_autosuggestion:636da6
@@ -58,4 +59,4 @@ SETUVAR fish_pager_color_selected_background:\x2d\x2dbackground\x3d2d3f76
 SETUVAR fish_pager_color_selected_completion:\x1d
 SETUVAR fish_pager_color_selected_description:\x1d
 SETUVAR fish_pager_color_selected_prefix:\x1d
-SETUVAR fish_user_paths:/Users/kbiel/\x2elocal/bin\x1e/usr/sbin\x1e/sbin\x1e/usr/local/bin\x1e/usr/bin\x1e/bin
+SETUVAR fish_user_paths:/usr/local/sbin\x1e/home/ibniss/\x2elocal/bin\x1e/Users/kbiel/\x2elocal/bin\x1e/usr/sbin\x1e/sbin\x1e/usr/local/bin\x1e/usr/bin\x1e/bin
