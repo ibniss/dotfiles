@@ -2,3 +2,5 @@
 .env
 .env.local
 .DS_Store
+# variables is generated and varies a lot
+fish/.config/fish/fish_variables
