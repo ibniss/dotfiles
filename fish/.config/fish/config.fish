@@ -23,3 +23,6 @@ set -gx VISUAL "nvim"
 
 # Set neovim as the program to open manpages
 set -gx MANPAGER 'nvim +Man!'
+
+# opencode
+fish_add_path /Users/kbiel/.opencode/bin
