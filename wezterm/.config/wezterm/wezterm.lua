@@ -99,7 +99,7 @@ local projects_table = {}
 
 -- add ~/dotfiles if exists
 if path_exists(home .. "/dotfiles") then
-  table.insert(projects_table, { id = "~/dotfiles", label = "dotfiles" })
+  table.insert(projects_table, { id = home .. "/dotfiles", label = "dotfiles" })
 end
 
 -- get all folders within home/code folder
