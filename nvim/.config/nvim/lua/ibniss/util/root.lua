@@ -19,7 +19,7 @@ M.spec = { 'lsp', { '.git', 'lua' }, 'cwd' }
 
 M.detectors = {}
 
-function M.detectors.cwd() return { vim.loop.cwd() } end
+function M.detectors.cwd() return { vim.uv.cwd() } end
 
 ---@alias lsp.Client.filter {id?: number, bufnr?: number, name?: string, method?: string, filter?:fun(client: lsp.Client):boolean}
 
@@ -63,18 +63,18 @@ end
 ---@param patterns string[]|string
 function M.detectors.pattern(buf, patterns)
     patterns = type(patterns) == 'string' and { patterns } or patterns
-    local path = M.bufpath(buf) or vim.loop.cwd()
+    local path = M.bufpath(buf) or vim.uv.cwd()
     local pattern = vim.fs.find(patterns, { path = path, upward = true })[1]
     return pattern and { vim.fs.dirname(pattern) } or {}
 end
 
 function M.bufpath(buf) return M.realpath(vim.api.nvim_buf_get_name(assert(buf))) end
 
-function M.cwd() return M.realpath(vim.loop.cwd()) or '' end
+function M.cwd() return M.realpath(vim.uv.cwd()) or '' end
 
 function M.realpath(path)
     if path == '' or path == nil then return nil end
-    path = vim.loop.fs_realpath(path) or path
+    path = vim.uv.fs_realpath(path) or path
     return Util.norm(path)
 end
 
@@ -133,7 +133,7 @@ function M.info()
     lines[#lines + 1] = '```lua'
     lines[#lines + 1] = 'vim.g.root_spec = ' .. vim.inspect(spec)
     lines[#lines + 1] = '```'
-    return roots[1] and roots[1].paths[1] or vim.loop.cwd()
+    return roots[1] and roots[1].paths[1] or vim.uv.cwd()
 end
 
 ---@type table<number, string>
@@ -164,7 +164,7 @@ function M.get(opts)
     local ret = M.cache[buf]
     if not ret then
         local roots = M.detect({ all = false })
-        ret = roots[1] and roots[1].paths[1] or vim.loop.cwd()
+        ret = roots[1] and roots[1].paths[1] or vim.uv.cwd()
         M.cache[buf] = ret
     end
     if opts and opts.normalize then return ret end
