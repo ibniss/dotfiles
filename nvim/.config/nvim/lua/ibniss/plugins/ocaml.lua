@@ -1,7 +1,7 @@
 return {
-    {
-        'tjdevries/ocaml.nvim',
-        dependencies = { 'stevearc/conform.nvim' },
-        build = 'make',
-    },
+  {
+    "tjdevries/ocaml.nvim",
+    dependencies = { "stevearc/conform.nvim" },
+    build = "make",
+  },
 }

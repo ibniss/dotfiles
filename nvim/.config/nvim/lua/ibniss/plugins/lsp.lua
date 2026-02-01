@@ -34,7 +34,7 @@ return {
       { "stevearc/conform.nvim" },
     },
     config = function()
-      local lspconfig = require("lspconfig")
+      local lspconfig = require "lspconfig"
 
       local vtsls_inlay_hints = {
         enumMemberValues = { enabled = true },
@@ -59,9 +59,7 @@ return {
         --     },
         -- },
         vtsls = {
-          on_attach = function(client, bufnr)
-            require("twoslash-queries").attach(client, bufnr)
-          end,
+          on_attach = function(client, bufnr) require("twoslash-queries").attach(client, bufnr) end,
           settings = {
             complete_function_calls = true,
             vtsls = {
@@ -150,18 +148,16 @@ return {
 
       -- run the mason installer
       vim.list_extend(ensure_installed, servers_to_install)
-      require("mason-tool-installer").setup({
+      require("mason-tool-installer").setup {
         ensure_installed = ensure_installed,
-      })
+      }
 
       local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       -- run lspconfig.setup() for each server
       for name, config in pairs(servers) do
         -- if config is true, then use default configuration
-        if config == true then
-          config = {}
-        end
+        if config == true then config = {} end
 
         -- use blink.cmp capabilities
         config = vim.tbl_deep_extend("force", {}, {
@@ -178,9 +174,7 @@ return {
           local client = assert(vim.lsp.get_client_by_id(args.data.client_id), "must have valid client")
 
           local settings = servers[client.name]
-          if type(settings) ~= "table" then
-            settings = {}
-          end
+          if type(settings) ~= "table" then settings = {} end
 
           --- helper function to set keymaps
           --- @param keys string
@@ -206,12 +200,12 @@ return {
           end, "[G]oto [N]ext and center")
 
           vim.keymap.set("n", "]e", function()
-            vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+            vim.diagnostic.goto_next { severity = vim.diagnostic.severity.ERROR }
             vim.api.nvim_feedkeys("zz", "n", false)
           end, { desc = "Go to next error diagnostic and center" })
 
           vim.keymap.set("n", "[e", function()
-            vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+            vim.diagnostic.goto_prev { severity = vim.diagnostic.severity.ERROR }
             vim.api.nvim_feedkeys("zz", "n", false)
           end, { desc = "Go to previous error diagnostic and center" })
 
@@ -223,19 +217,26 @@ return {
           map("<leader>q", vim.diagnostic.setloclist, "Add buffer diagnostics to loclist")
           map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction", { "n", "x" })
 
-          vim.keymap.set("n", "<leader>rn", function()
-            return ":IncRename " .. vim.fn.expand("<cword>")
-          end, { expr = true })
+          vim.keymap.set(
+            "n",
+            "<leader>rn",
+            function() return ":IncRename " .. vim.fn.expand "<cword>" end,
+            { expr = true }
+          )
 
           --- Insert mode - C-K to show signature
           vim.keymap.set("i", "<C-K>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "[C-K] Signature Help" })
 
           if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
-            map("<leader>th", function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({
-                bufnr = bufnr,
-              }))
-            end, "[T]oggle Inlay [H]ints")
+            map(
+              "<leader>th",
+              function()
+                vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled {
+                  bufnr = bufnr,
+                })
+              end,
+              "[T]oggle Inlay [H]ints"
+            )
           end
 
           -- Override server capabilities
@@ -252,7 +253,7 @@ return {
         end,
       })
 
-      vim.diagnostic.config({
+      vim.diagnostic.config {
         severity_sort = true,
         float = {
           style = "minimal",
@@ -264,7 +265,7 @@ return {
         },
 
         -- auto open float window when jumping with [d ]d etc
-        jump = { float = true } ,
+        jump = { float = true },
 
         -- don't update diagnostics until out of insert mode
         update_in_insert = false,
@@ -274,7 +275,7 @@ return {
 
         virtual_text = true,
         virtual_lines = false,
-      })
+      }
     end,
   },
   -- {

@@ -1,5 +1,5 @@
 -- Pull in the wezterm API
-local wezterm = require("wezterm") --[[@as Wezterm]]
+local wezterm = require "wezterm" --[[@as Wezterm]]
 
 -- This will hold the configuration.
 local config = wezterm.config_builder()
@@ -7,11 +7,11 @@ local config = wezterm.config_builder()
 -- Platform detection
 local function get_os()
   local target = wezterm.target_triple
-  if target:find("apple") then
+  if target:find "apple" then
     return "macos"
-  elseif target:find("linux") then
+  elseif target:find "linux" then
     return "linux"
-  elseif target:find("windows") then
+  elseif target:find "windows" then
     return "windows"
   else
     return "unknown"
@@ -77,9 +77,7 @@ end
 
 local home = wezterm.home_dir
 
-local function get_base_project_path()
-  return home .. "/code"
-end
+local function get_base_project_path() return home .. "/code" end
 
 local function path_exists(path)
   local f = io.open(path, "r")
@@ -104,7 +102,7 @@ end
 
 -- get all folders within home/code folder
 -- split the string into a table
-local projects = io.popen("ls -d " .. base_project_path .. "/*"):read("*a")
+local projects = io.popen("ls -d " .. base_project_path .. "/*"):read "*a"
 for project in string.gmatch(projects, "([^\n]+)") do
   -- remove the base path
   local project_name = string.gsub(project, base_project_path .. "/", "")
@@ -130,46 +128,46 @@ config.keys = {
   {
     key = "LeftArrow",
     mods = "OPT",
-    action = wezterm.action.SendKey({
+    action = wezterm.action.SendKey {
       key = "b",
       mods = "ALT",
-    }),
+    },
   },
   {
     key = "RightArrow",
     mods = "OPT",
-    action = wezterm.action.SendKey({ key = "f", mods = "ALT" }),
+    action = wezterm.action.SendKey { key = "f", mods = "ALT" },
   },
   {
     mods = "LEADER | SHIFT",
     key = '"',
-    action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
+    action = wezterm.action.SplitVertical { domain = "CurrentPaneDomain" },
   },
   {
     mods = "LEADER | SHIFT",
     key = "%",
-    action = wezterm.action.SplitHorizontal({
+    action = wezterm.action.SplitHorizontal {
       domain = "CurrentPaneDomain",
-    }),
+    },
   },
 
   -- move between split panes
-  split_nav_move("h"),
-  split_nav_move("j"),
-  split_nav_move("k"),
-  split_nav_move("l"),
+  split_nav_move "h",
+  split_nav_move "j",
+  split_nav_move "k",
+  split_nav_move "l",
 
   -- resize panes
-  split_nav_resize("Left"),
-  split_nav_resize("Right"),
-  split_nav_resize("Up"),
-  split_nav_resize("Down"),
+  split_nav_resize "Left",
+  split_nav_resize "Right",
+  split_nav_resize "Up",
+  split_nav_resize "Down",
 
   -- Creating a new tab (tmux window)
   {
     key = "c",
     mods = "LEADER",
-    action = wezterm.action.SpawnTab("DefaultDomain"),
+    action = wezterm.action.SpawnTab "DefaultDomain",
   },
 
   -- Moving between tabs N/P
@@ -188,7 +186,7 @@ config.keys = {
   {
     key = "x",
     mods = "LEADER",
-    action = wezterm.action.CloseCurrentPane({ confirm = true }),
+    action = wezterm.action.CloseCurrentPane { confirm = true },
   },
 
   -- Toggle pane zoom (maximize/restore pane size within its tab)
@@ -203,7 +201,7 @@ config.keys = {
   {
     key = "a",
     mods = "LEADER|CTRL",
-    action = wezterm.action.SendKey({ key = "a", mods = "CTRL" }),
+    action = wezterm.action.SendKey { key = "a", mods = "CTRL" },
   },
   -- C-A D -> debug
   {
@@ -215,18 +213,18 @@ config.keys = {
   {
     key = "s",
     mods = "LEADER",
-    action = wezterm.action.ShowLauncherArgs({
+    action = wezterm.action.ShowLauncherArgs {
       flags = "FUZZY|WORKSPACES",
       title = "Workspaces",
-    }),
+    },
   },
   {
     key = "w",
     mods = "LEADER",
-    action = wezterm.action.ShowLauncherArgs({
+    action = wezterm.action.ShowLauncherArgs {
       flags = "FUZZY|TABS",
       title = "Tabs",
-    }),
+    },
   },
   -- fuzzy find workspaces per project or create new
   {
@@ -234,20 +232,20 @@ config.keys = {
     mods = "LEADER",
     action = wezterm.action_callback(function(window, pane)
       window:perform_action(
-        wezterm.action.InputSelector({
+        wezterm.action.InputSelector {
           action = wezterm.action_callback(function(inner_window, inner_pane, id, label)
             if not id and not label then
-              wezterm.log_info("No project selected")
+              wezterm.log_info "No project selected"
             else
               wezterm.log_info("Selected project: " .. id)
               inner_window:perform_action(
-                wezterm.action.SwitchToWorkspace({
+                wezterm.action.SwitchToWorkspace {
                   name = label,
                   spawn = {
                     label = "Workspace: " .. label,
                     cwd = id,
                   },
-                }),
+                },
                 inner_pane
               )
             end
@@ -256,7 +254,7 @@ config.keys = {
           choices = projects_table,
           fuzzy = true,
           fuzzy_description = "Fuzzy find and/or make a workspace for a project: ",
-        }),
+        },
         pane
       )
     end),
@@ -277,24 +275,18 @@ end
 wezterm.on("format-tab-title", function(tab, tabs)
   local title = tab.active_pane.title
 
-  if tab.tab_title and #tab.tab_title > 0 then
-    title = tab.tab_title
-  end
+  if tab.tab_title and #tab.tab_title > 0 then title = tab.tab_title end
 
   -- get last part of the active process's path name, e.g. /opt/bin/nvim -> nvim
   local pname = tab.active_pane.foreground_process_name
   pname = string.match(pname, "([^/]+)$")
-  if pname and #pname > 0 then
-    title = pname
-  end
+  if pname and #pname > 0 then title = pname end
 
   return " " .. tab.tab_index + 1 .. ": " .. title .. " "
 end)
 
 local function get_appearance()
-  if wezterm.gui then
-    return wezterm.gui.get_appearance()
-  end
+  if wezterm.gui then return wezterm.gui.get_appearance() end
   return "Dark"
 end
 
@@ -302,9 +294,7 @@ local dark_theme = "tokyonight_moon"
 local light_theme = "tokyonight_day"
 
 local function scheme_for_appearance(appearance)
-  if appearance:find("Dark") then
-    return dark_theme
-  end
+  if appearance:find "Dark" then return dark_theme end
 
   return light_theme
 end
@@ -314,9 +304,7 @@ config.color_scheme = scheme_for_appearance(get_appearance())
 config.window_decorations = "RESIZE"
 
 -- Platform-specific window settings
-if os_type == "macos" then
-  config.native_macos_fullscreen_mode = true
-end
+if os_type == "macos" then config.native_macos_fullscreen_mode = true end
 
 -- keep status bar up to date (polls every few seconds)
 wezterm.on("update-right-status", function(window, pane)
@@ -326,16 +314,16 @@ wezterm.on("update-right-status", function(window, pane)
   overrides.color_scheme = scheme_for_appearance(appearance)
   window:set_config_overrides(overrides)
 
-  local theme_colors = wezterm.get_builtin_color_schemes()[appearance:find("Dark") and dark_theme or light_theme]
-  local date = wezterm.strftime("%H:%M")
+  local theme_colors = wezterm.get_builtin_color_schemes()[appearance:find "Dark" and dark_theme or light_theme]
+  local date = wezterm.strftime "%H:%M"
 
-  window:set_right_status(wezterm.format({
+  window:set_right_status(wezterm.format {
     { Attribute = { Intensity = "Bold" } },
     { Background = { Color = theme_colors.background } },
     { Foreground = { Color = theme_colors.foreground } },
     { Text = date .. "  " },
     { Text = "󰉖 " .. " " .. window:active_workspace() },
-  }))
+  })
 end)
 
 -- render file:line number strings as links
@@ -360,16 +348,12 @@ local function resolve_path(nvim_pane, clicked_pane, path)
   -- candidate 1: relative to the emitter's cwd
   local cand1 = cwd .. "/" .. path
 
-  if path_exists(cand1) then
-    return cand1
-  end
+  if path_exists(cand1) then return cand1 end
 
   -- candidate 2: relative to the nvim's cwd (nvim root, repo root)
   local cand2 = nvim_cwd .. "/" .. path
 
-  if path_exists(cand2) then
-    return cand2
-  end
+  if path_exists(cand2) then return cand2 end
 
   -- fallback: as-is
   return path
@@ -387,13 +371,11 @@ wezterm.on("open-uri", function(window, clicked_pane, uri)
       for _, pane_with_info in ipairs(panes) do
         local pane = pane_with_info.pane
         local process_name = pane:get_foreground_process_name()
-        local is_nvim = process_name:match("nvim$")
+        local is_nvim = process_name:match "nvim$"
         if is_nvim then
           local abs_path = path
 
-          if not path:match("^/") then
-            abs_path = resolve_path(pane, clicked_pane, path)
-          end
+          if not path:match "^/" then abs_path = resolve_path(pane, clicked_pane, path) end
 
           -- send keys -> Escape ":e $file" C-m "${line}G"
           window:perform_action({
