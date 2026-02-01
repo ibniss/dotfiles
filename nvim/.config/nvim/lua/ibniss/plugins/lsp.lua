@@ -336,8 +336,6 @@ return {
       })
 
       vim.diagnostic.config({
-        virtual_text = true,
-        underline = true,
         severity_sort = true,
         float = {
           style = "minimal",
@@ -347,6 +345,18 @@ return {
           prefix = "",
           focusable = false,
         },
+
+        -- auto open float window when jumping with [d ]d etc
+        jump = { float = true } ,
+
+        -- don't update diagnostics until out of insert mode
+        update_in_insert = false,
+
+        -- only underline errors
+        underline = { severity = vim.diagnostic.severity.ERROR },
+
+        virtual_text = true,
+        virtual_lines = false,
       })
     end,
   },
