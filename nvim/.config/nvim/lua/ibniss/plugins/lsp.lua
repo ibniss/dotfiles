@@ -1,86 +1,4 @@
 return {
-  -- Autocompletion
-  {
-    "hrsh7th/nvim-cmp",
-    event = "InsertEnter",
-    dependencies = {
-      { "hrsh7th/cmp-buffer" }, -- Optional
-      { "hrsh7th/cmp-path" }, -- Optional
-      { "hrsh7th/cmp-cmdline" }, -- Cmdline completions
-      { "hrsh7th/cmp-nvim-lua" }, -- Optional
-      { "hrsh7th/cmp-nvim-lsp" },
-      -- icons for completion items
-      { "onsails/lspkind.nvim" },
-    },
-    config = function()
-      -- And you can configure cmp even more, if you want to.
-      local cmp = require("cmp")
-      local cmp_select = { behavior = cmp.SelectBehavior.Select }
-
-      vim.opt.completeopt = { "menu", "menuone", "noselect" }
-
-      local lspkind = require("lspkind")
-
-      cmp.setup({
-        preselect = "item", -- Automatically select the first item
-        completion = {
-          completeopt = "menu,menuone,noinsert",
-        },
-        sources = {
-          { name = "path" },
-          { name = "nvim_lsp" },
-          { name = "nvim_lua" },
-          { name = "buffer", keyword_length = 3 },
-        },
-        formatting = {
-          expandable_indicator = true,
-          fields = {
-            "kind",
-            "abbr",
-            "menu",
-          },
-          format = lspkind.cmp_format({
-            mode = "symbol",
-            ellipsis_char = "...",
-            show_labelDetails = true,
-            preset = "codicons", -- uses vscode codicons
-          }),
-        },
-        mapping = cmp.mapping.preset.insert({
-          ["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
-          ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
-          ["<C-y>"] = cmp.mapping.confirm({ select = true }),
-          ["<C-Space>"] = cmp.mapping.complete(),
-        }),
-        -- add border to the completion window
-        window = {
-          documentation = cmp.config.window.bordered(),
-          completion = cmp.config.window.bordered(),
-        },
-      })
-
-      -- Cmdline
-      cmp.setup.cmdline("/", {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = {
-          { name = "buffer" },
-        },
-      })
-      cmp.setup.cmdline(":", {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = cmp.config.sources({
-          { name = "path" },
-        }, {
-          {
-            name = "cmdline",
-            option = {
-              ignore_cmds = { "Man", "!" },
-            },
-          },
-        }),
-      })
-    end,
-  },
   -- LSP
   {
     "neovim/nvim-lspconfig",
@@ -109,8 +27,8 @@ return {
       },
       { "Bilal2453/luvit-meta", lazy = true },
 
-      -- cmp for completions
-      { "hrsh7th/cmp-nvim-lsp" },
+      -- blink.cmp for completions
+      { "saghen/blink.cmp" },
 
       -- conform needs to be setup first
       { "stevearc/conform.nvim" },
@@ -236,7 +154,7 @@ return {
         ensure_installed = ensure_installed,
       })
 
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
 
       -- run lspconfig.setup() for each server
       for name, config in pairs(servers) do
@@ -245,7 +163,7 @@ return {
           config = {}
         end
 
-        -- use cmp capabilities
+        -- use blink.cmp capabilities
         config = vim.tbl_deep_extend("force", {}, {
           capabilities = capabilities,
         }, config)
