@@ -1,3 +1,4 @@
+---@module 'neogit'
 return {
     'NeogitOrg/neogit',
     dependencies = {
@@ -5,6 +6,7 @@ return {
         'sindrets/diffview.nvim', -- optional - Diff integration
         'nvim-telescope/telescope.nvim',
     },
+    ---@type NeogitConfig
     opts = {
         commit_editor = {
             kind = 'tab',

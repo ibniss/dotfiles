@@ -1,3 +1,4 @@
+---@module 'noice'
 return {
     'folke/noice.nvim',
     event = 'VeryLazy',
@@ -38,6 +39,7 @@ return {
             end,
         },
     },
+    ---@type NoiceConfig
     opts = {
         lsp = {
             override = {

@@ -20,6 +20,8 @@ return {
         desc = "[F]ormat buffer",
       },
     },
+    ---@module 'conform'
+    ---@type conform.setupOpts
     opts = {
       -- Define your formatters
       formatters_by_ft = {

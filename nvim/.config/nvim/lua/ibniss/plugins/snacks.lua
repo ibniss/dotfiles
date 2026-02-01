@@ -1,5 +1,7 @@
+---@module 'snacks'
 return {
     'folke/snacks.nvim',
+    ---@type snacks.Config
     opts = {
         -- files >1.5MB disable LSP/treesitter
         bigfile = {

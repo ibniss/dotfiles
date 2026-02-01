@@ -1,7 +1,9 @@
+---@module 'tokyonight'
 return {
     'folke/tokyonight.nvim',
     lazy = false,
     priority = 1000,
+    ---@type tokyonight.Config
     opts = {
         transparent = true,
         styles = {
