@@ -1,31 +1,17 @@
 return {
     'theprimeagen/harpoon',
+    branch = 'harpoon2',
+    dependencies = { 'nvim-lua/plenary.nvim' },
     config = function()
-        local mark = require('harpoon.mark')
-        local ui = require('harpoon.ui')
+        local harpoon = require('harpoon')
+        harpoon:setup()
 
-        ---  add file
-        vim.keymap.set('n', '<leader>ha', mark.add_file)
-        vim.keymap.set('n', '<C-e>', ui.toggle_quick_menu)
+        vim.keymap.set('n', '<leader>ha', function() harpoon:list():add() end, { desc = 'Harpoon add file' })
+        vim.keymap.set('n', '<C-e>', function() harpoon.ui:toggle_quick_menu(harpoon:list()) end, { desc = 'Harpoon menu' })
 
-        --- Files 1-2-3-4 -> space - h - 1/2/3/4
-        vim.keymap.set('n', '<leader>h1', function() ui.nav_file(1) end)
-        vim.keymap.set('n', '<leader>h2', function() ui.nav_file(2) end)
-        vim.keymap.set('n', '<leader>h3', function() ui.nav_file(3) end)
-        vim.keymap.set('n', '<leader>h4', function() ui.nav_file(4) end)
-
-        local status, width = pcall(vim.api.nvim_win_get_width, 0)
-
-        if not status or not width or width <= 0 then
-            width = 60
-        else
-            width = math.floor(width * 0.6)
-        end
-
-        require('harpoon').setup({
-            menu = {
-                width = width,
-            },
-        })
+        vim.keymap.set('n', '<leader>h1', function() harpoon:list():select(1) end, { desc = 'Harpoon file 1' })
+        vim.keymap.set('n', '<leader>h2', function() harpoon:list():select(2) end, { desc = 'Harpoon file 2' })
+        vim.keymap.set('n', '<leader>h3', function() harpoon:list():select(3) end, { desc = 'Harpoon file 3' })
+        vim.keymap.set('n', '<leader>h4', function() harpoon:list():select(4) end, { desc = 'Harpoon file 4' })
     end,
 }
