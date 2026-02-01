@@ -2,9 +2,12 @@
 ## Code Quality Standards
 
 - Make minimal, surgical changes
-- **Never compromise type safety**: No `any`, no non-null assertion operator (`!`), no type assertions (`as Type`), `# type: ignore`
-- **Make illegal states unrepresentable**: Model domain with ADTs/discriminated unions; parse inputs at boundaries into typed structures; if state can't exist, code can't mishandle it
-- **Abstractions**: Consciously constrained, pragmatically parameterised, doggedly documented
+- Strive for concise, simple solutions
+- If a problem can be solved in a simpler way, propose it
+- If asked to do too much work at once, stop and state that clearly
+- Never compromise type safety if possible: in Typescript: No `any`, no non-null assertion operator (`!`), no type assertions (`as Type`). In Python: no `# type: ignore`, no `cast`.
+- Make illegal states unrepresentable: Model domain with ADTs/discriminated unions; parse inputs at boundaries into typed structures; if state can't exist, code can't mishandle it
+- Abstractions: Consciously constrained, pragmatically parameterised, doggedly documented
 
 ### **ENTROPY REMINDER**
 This codebase will outlive you. Every shortcut you take becomes someone else's burden. Every hack compounds into technical debt that slows the whole team down.
