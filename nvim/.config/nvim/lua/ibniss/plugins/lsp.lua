@@ -2,11 +2,9 @@ return {
   -- LSP
   {
     "neovim/nvim-lspconfig",
-    cmd = { "LspInfo", "LspInstall", "LspStart" },
-    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      { "williamboman/mason.nvim" },
-      { "williamboman/mason-lspconfig.nvim" },
+      -- Mason must be loaded before dependents, opts = {} ensures setup() is called
+      { "mason-org/mason.nvim", opts = {} },
       { "WhoIsSethDaniel/mason-tool-installer.nvim" },
       {
         -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
@@ -34,8 +32,6 @@ return {
       { "stevearc/conform.nvim" },
     },
     config = function()
-      local lspconfig = require "lspconfig"
-
       local vtsls_inlay_hints = {
         enumMemberValues = { enabled = true },
         functionLikeReturnTypes = { enabled = true },
@@ -47,19 +43,12 @@ return {
         variableTypeWhenTypeMatchesNames = { enabled = true },
       }
 
-      -- server configurations
-      -- true means default configuration
+      -- Server configurations
+      -- true means default configuration (uses nvim-lspconfig's lsp/ directory)
+      -- table means custom overrides merged with nvim-lspconfig defaults
       local servers = {
         lua_ls = true,
-        -- ts_ls = {
-        --     root_dir = require('lspconfig').util.root_pattern('package.json'),
-        --     single_file = false,
-        --     server_capabilities = {
-        --         documentFormattingProvider = false,
-        --     },
-        -- },
         vtsls = {
-          on_attach = function(client, bufnr) require("twoslash-queries").attach(client, bufnr) end,
           settings = {
             complete_function_calls = true,
             vtsls = {
@@ -104,79 +93,62 @@ return {
         rust_analyzer = true,
         basedpyright = true,
         eslint = true,
-        -- biome = true,
         jsonls = true,
         ocamllsp = {
           manual_install = true,
           cmd = { "dune", "tools", "exec", "ocamllsp" },
-          -- cmd = { "dune", "exec", "ocamllsp" },
           settings = {
             codelens = { enable = true },
             inlayHints = { enable = true },
             syntaxDocumentation = { enable = true },
           },
-
-          server_capabilities = { semanticTokensProvider = false },
+          -- Disable semantic tokens for ocamllsp
+          on_attach = function(client) client.server_capabilities.semanticTokensProvider = nil end,
         },
       }
 
       -- setup ocaml
       require("ocaml").setup()
 
-      -- filter out servers with manual_install
-      local servers_to_install = vim.tbl_filter(function(key)
-        local t = servers[key]
-        if type(t) == "table" then
-          return not t.manual_install
-        else
-          return t
-        end
-      end, vim.tbl_keys(servers))
-
-      require("mason").setup()
-
-      -- which servers should be autoinstalled by mason
+      -- Mason package names (differ from LSP server names)
       local ensure_installed = {
-        "ts_ls",
-        "lua_ls",
-        "rust_analyzer",
+        "lua-language-server",
+        "rust-analyzer",
         "basedpyright",
-        "eslint",
+        "eslint-lsp",
         "gopls",
         "vtsls",
+        "clangd",
+        "json-lsp",
       }
 
-      -- run the mason installer
-      vim.list_extend(ensure_installed, servers_to_install)
       require("mason-tool-installer").setup {
         ensure_installed = ensure_installed,
       }
 
       local capabilities = require("blink.cmp").get_lsp_capabilities()
 
-      -- run lspconfig.setup() for each server
+      -- Configure and enable LSP servers using nvim 0.11 native API
       for name, config in pairs(servers) do
-        -- if config is true, then use default configuration
         if config == true then config = {} end
 
-        -- use blink.cmp capabilities
-        config = vim.tbl_deep_extend("force", {}, {
-          capabilities = capabilities,
-        }, config)
+        -- Merge blink.cmp capabilities
+        config.capabilities = vim.tbl_deep_extend("force", {}, capabilities, config.capabilities or {})
 
-        lspconfig[name].setup(config)
+        -- vim.lsp.config() defines/extends the configuration
+        -- nvim-lspconfig provides base configs in its lsp/ directory
+        vim.lsp.config(name, config)
+        vim.lsp.enable(name)
       end
 
-      -- run lsp setup when LSP is attached to buffer
+      -- LspAttach autocmd for keymaps and per-buffer setup
       vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function(args)
-          local bufnr = args.buf
-          local client = assert(vim.lsp.get_client_by_id(args.data.client_id), "must have valid client")
+        group = vim.api.nvim_create_augroup("ibniss-lsp-attach", { clear = true }),
+        callback = function(event)
+          local bufnr = event.buf
+          local client = assert(vim.lsp.get_client_by_id(event.data.client_id), "must have valid client")
 
-          local settings = servers[client.name]
-          if type(settings) ~= "table" then settings = {} end
-
-          --- helper function to set keymaps
+          --- Helper function to set keymaps
           --- @param keys string
           --- @param func function | string
           --- @param desc string
@@ -186,70 +158,61 @@ return {
             vim.keymap.set(mode, keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
           end
 
+          -- Navigation keymaps
           map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
           map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
           map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
           map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementations")
+
+          -- Diagnostic navigation with centering
           map("[d", function()
             vim.diagnostic.goto_prev()
             vim.api.nvim_feedkeys("zz", "n", false)
-          end, "[G]oto [P]rev and center")
+          end, "Prev diagnostic and center")
           map("]d", function()
             vim.diagnostic.goto_next()
             vim.api.nvim_feedkeys("zz", "n", false)
-          end, "[G]oto [N]ext and center")
-
-          vim.keymap.set("n", "]e", function()
-            vim.diagnostic.goto_next { severity = vim.diagnostic.severity.ERROR }
-            vim.api.nvim_feedkeys("zz", "n", false)
-          end, { desc = "Go to next error diagnostic and center" })
-
-          vim.keymap.set("n", "[e", function()
+          end, "Next diagnostic and center")
+          map("[e", function()
             vim.diagnostic.goto_prev { severity = vim.diagnostic.severity.ERROR }
             vim.api.nvim_feedkeys("zz", "n", false)
-          end, { desc = "Go to previous error diagnostic and center" })
+          end, "Prev error and center")
+          map("]e", function()
+            vim.diagnostic.goto_next { severity = vim.diagnostic.severity.ERROR }
+            vim.api.nvim_feedkeys("zz", "n", false)
+          end, "Next error and center")
 
+          -- Symbol search
           map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
-
           map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
 
-          map("<leader>e", vim.diagnostic.open_float, "Open float window with diagnostics")
-          map("<leader>q", vim.diagnostic.setloclist, "Add buffer diagnostics to loclist")
-          map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction", { "n", "x" })
+          -- Diagnostics
+          map("<leader>e", vim.diagnostic.open_float, "Open diagnostic float")
+          map("<leader>q", vim.diagnostic.setloclist, "Add diagnostics to loclist")
 
+          -- Actions
+          map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction", { "n", "x" })
           vim.keymap.set(
             "n",
             "<leader>rn",
             function() return ":IncRename " .. vim.fn.expand "<cword>" end,
-            { expr = true }
+            { expr = true, desc = "LSP: Rename" }
           )
 
-          --- Insert mode - C-K to show signature
-          vim.keymap.set("i", "<C-K>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "[C-K] Signature Help" })
+          -- Signature help in insert mode
+          vim.keymap.set("i", "<C-K>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })
 
-          if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+          -- Inlay hints toggle
+          if client:supports_method("textDocument/inlayHint", bufnr) then
             map(
               "<leader>th",
-              function()
-                vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled {
-                  bufnr = bufnr,
-                })
-              end,
+              function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = bufnr }) end,
               "[T]oggle Inlay [H]ints"
             )
           end
 
-          -- Override server capabilities
-          if settings.server_capabilities then
-            for k, v in pairs(settings.server_capabilities) do
-              if v == vim.NIL then
-                ---@diagnostic disable-next-line: cast-local-type
-                v = nil
-              end
-
-              client.server_capabilities[k] = v
-            end
-          end
+          -- Server-specific on_attach: twoslash-queries for vtsls
+          if client.name == "vtsls" then require("twoslash-queries").attach(client, bufnr) end
         end,
       })
 

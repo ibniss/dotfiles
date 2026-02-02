@@ -10,6 +10,7 @@ return {
     --   If not available, we use `mini` as the fallback
     {
       "rcarriga/nvim-notify",
+      main = "notify", -- lua module is "notify", not "nvim-notify"
       keys = {
         {
           "<leader>un",
@@ -22,21 +23,16 @@ return {
           desc = "Dismiss all Notifications",
         },
       },
-      config = function()
-        local tokyonight = require("tokyonight.colors").setup()
-
-        require("notify").setup {
-          timeout = 1500,
-          fps = 180,
-          stages = "fade_in_slide_out",
-          max_height = function() return math.floor(vim.o.lines * 0.75) end,
-          max_width = function() return math.floor(vim.o.columns * 0.75) end,
-          on_open = function(win) vim.api.nvim_win_set_config(win, { zindex = 100 }) end,
-          render = "wrapped-compact",
-        }
-
-        vim.cmd([[ hi NotifyBackground guibg = ]] .. tokyonight.bg)
-      end,
+      opts = {
+        timeout = 1500,
+        merge_duplicates = true,
+        fps = 180,
+        stages = "fade_in_slide_out",
+        max_height = function() return math.floor(vim.o.lines * 0.75) end,
+        max_width = function() return math.floor(vim.o.columns * 0.75) end,
+        on_open = function(win) vim.api.nvim_win_set_config(win, { zindex = 100 }) end,
+        render = "wrapped-compact",
+      },
     },
   },
   ---@type NoiceConfig

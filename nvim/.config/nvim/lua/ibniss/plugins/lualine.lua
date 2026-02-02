@@ -53,6 +53,7 @@ return {
             cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
             color = "Statement",
           },
+          { "venv-selector" },
           { "diff" },
         },
         lualine_y = {

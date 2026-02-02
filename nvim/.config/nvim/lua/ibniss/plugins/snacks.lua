@@ -9,15 +9,13 @@ return {
     },
     -- better vim.ui.input
     input = {},
+    -- disable notifier - using noice.nvim + nvim-notify instead
+    notifier = { enabled = false },
   },
-  config = function()
+  config = function(_, opts)
     local Snacks = require "snacks"
 
-    Snacks.setup {
-      bigfile = {
-        enabled = true,
-      },
-    }
+    Snacks.setup(opts)
 
     -- singleton terminal
     local win = nil
