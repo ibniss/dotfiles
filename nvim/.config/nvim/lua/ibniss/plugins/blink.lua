@@ -17,15 +17,26 @@ return {
 
     completion = {
       documentation = {
-        auto_show = true,
-        auto_show_delay_ms = 250,
+        -- (Default) Only show the documentation popup when manually triggered (C-Space)
+        auto_show = false,
         window = { border = "rounded" },
       },
       menu = { border = "rounded" },
     },
 
     sources = {
-      default = { "lsp", "path", "buffer" },
+      default = { "lazydev", "lsp", "path", "buffer" },
+      -- TEST: don't complete until 2 chars typed
+      min_keyword_length = 2,
+      --  register lazydev completions
+      providers = {
+        lazydev = {
+          name = "LazyDev",
+          module = "lazydev.integrations.blink",
+          -- make lazydev completions top priority (see `:h blink.cmp`)
+          score_offset = 100,
+        },
+      },
     },
 
     -- Use Rust fuzzy matcher for better performance
