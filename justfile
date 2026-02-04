@@ -224,7 +224,7 @@ _check-cmd-or cmd1 cmd2 missing_icon:
 install-tools:
     @echo "📦 Installing extra CLI tools..."
     @if [ "{{os()}}" = "macos" ]; then \
-        brew install git-delta git-lfs tldr tree; \
+        brew install git-delta git-lfs tree && brew install --formula tlrc; \
     elif [ "{{os()}}" = "linux" ]; then \
         sudo apt-get install -y git-delta git-lfs tldr tree; \
     fi
