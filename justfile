@@ -14,7 +14,7 @@ default:
     @just --list
 
 # Install all dotfiles using stow
-install: _install-all-stow _install-keyd-if-linux
+install: _install-all-stow _install-keyd-if-linux _install-aerospace-if-macos
     @echo "✅ All dotfiles installed successfully!"
     @echo "ℹ️  Restart your shell"
 
@@ -82,6 +82,25 @@ install-keyd:
 _install-keyd-if-linux:
     @if [ "{{os()}}" = "linux" ]; then just install-keyd; fi
 
+# Special: Install aerospace (macOS only, tiling window manager)
+install-aerospace:
+    @if [ "{{os()}}" != "macos" ]; then \
+        echo "⚠️  aerospace is only available on macOS"; \
+        exit 0; \
+    fi
+    @just _stow aerospace
+
+uninstall-aerospace:
+    @if [ "{{os()}}" != "macos" ]; then \
+        echo "⚠️  aerospace is only available on macOS"; \
+        exit 0; \
+    fi
+    @just _unstow aerospace
+
+[private]
+_install-aerospace-if-macos:
+    @if [ "{{os()}}" = "macos" ]; then just install-aerospace; fi
+
 # Show installation status
 status:
     @echo "📊 Dotfiles Status"
@@ -90,9 +109,11 @@ status:
     @echo ""
     @echo "Stow packages:"
     @for pkg in {{stow_packages}}; do just _check-package $pkg; done
-    @echo ""
-    @echo "Special packages:"
-    @if [ "{{os()}}" = "linux" ]; then just _check-special keyd "/etc/keyd/default.conf" file; fi
+    @if [ "{{os()}}" = "linux" ]; then \
+        echo ""; \
+        echo "Special packages:"; \
+        just _check-special keyd "/etc/keyd/default.conf" file; \
+    fi
 
 # Check if a stow package is installed
 [private]
@@ -214,6 +235,7 @@ help:
     @echo "  just install-opencode Install opencode config"
     @echo "  just install-git     Install git config"
     @echo "  just install-keyd    Install keyd config (Linux only)"
+    @echo "  just install-aerospace Install aerospace config (macOS only)"
     @echo ""
     @echo "Stow packages: {{stow_packages}}"
     @echo ""

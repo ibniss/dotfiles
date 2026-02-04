@@ -47,6 +47,15 @@
       "platforms": [
         "linux"
       ]
+    },
+    "aerospace": {
+      "type": "stow",
+      "paths": [
+        ".aerospace.toml"
+      ],
+      "platforms": [
+        "macos"
+      ]
     }
   },
   "dependencies": {
