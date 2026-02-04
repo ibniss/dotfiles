@@ -46,8 +46,6 @@ return {
         return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
       end, names)
 
-      -- print('names' .. vim.inspect(names))
-
       -- Run linters.
       if #names > 0 then lint.try_lint(names) end
     end

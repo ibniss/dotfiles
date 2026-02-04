@@ -43,6 +43,6 @@ return {
     fuzzy = { implementation = "prefer_rust" },
 
     -- Show signature help while typing function arguments
-    signature = { enabled = true },
+    signature = { enabled = true, window = { border = "rounded" } },
   },
 }
