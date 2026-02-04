@@ -185,10 +185,16 @@ check-deps:
     @echo "Development:"
     @just _check-cmd dune "⚠️"
     @echo ""
+    @echo "Git tools:"
+    @just _check-cmd delta "⚠️"
+    @just _check-cmd git-lfs "⚠️"
+    @echo ""
     @echo "Optional:"
     @just _check-cmd zoxide "⚠️"
     @just _check-cmd-or bat batcat "⚠️"
     @just _check-cmd eza "⚠️"
+    @just _check-cmd tldr "⚠️"
+    @just _check-cmd tree "⚠️"
 
 # Check if a command exists
 [private]
@@ -213,6 +219,16 @@ _check-cmd-or cmd1 cmd2 missing_icon:
     else
         echo "{{missing_icon}}"
     fi
+
+# Install extra CLI tools (git-delta, git-lfs, tldr, tree)
+install-tools:
+    @echo "📦 Installing extra CLI tools..."
+    @if [ "{{os()}}" = "macos" ]; then \
+        brew install git-delta git-lfs tldr tree; \
+    elif [ "{{os()}}" = "linux" ]; then \
+        sudo apt-get install -y git-delta git-lfs tldr tree; \
+    fi
+    @echo "✅ Extra tools installed"
 
 # Remove broken symlinks
 clean:
@@ -244,6 +260,7 @@ help:
     @echo "  just restow          Restow all packages (after repo updates)"
     @echo "  just status          Show installation status"
     @echo "  just check-deps      Check required dependencies (including stow)"
+    @echo "  just install-tools   Install extra CLI tools (git-delta, git-lfs, tldr, tree)"
     @echo "  just clean           Remove broken symlinks"
     @echo ""
     @echo "Individual installs:"
