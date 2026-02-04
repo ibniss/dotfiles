@@ -55,7 +55,6 @@ install-nvim: (_stow "nvim")
 install-wezterm: (_stow "wezterm")
 install-fish: (_stow "fish")
 install-mise: (_stow "mise")
-install-starship: (_stow "starship")
 install-opencode: (_stow "opencode")
 install-git: (_stow "git")
 
@@ -63,7 +62,6 @@ uninstall-nvim: (_unstow "nvim")
 uninstall-wezterm: (_unstow "wezterm")
 uninstall-fish: (_unstow "fish")
 uninstall-mise: (_unstow "mise")
-uninstall-starship: (_unstow "starship")
 uninstall-opencode: (_unstow "opencode")
 uninstall-git: (_unstow "git")
 
@@ -140,7 +138,6 @@ check-deps:
     @just _check-cmd git "❌"
     @just _check-cmd stow "❌"
     @just _check-cmd nvim "⚠️"
-    @just _check-cmd starship "⚠️"
     @just _check-cmd mise "⚠️"
     @just _check-cmd fzf "⚠️"
     @just _check-cmd just "⚠️"
@@ -214,7 +211,6 @@ help:
     @echo "  just install-fish     Install fish config"
     @echo "  just install-wezterm Install WezTerm config"
     @echo "  just install-mise    Install mise config"
-    @echo "  just install-starship Install Starship config"
     @echo "  just install-opencode Install opencode config"
     @echo "  just install-git     Install git config"
     @echo "  just install-keyd    Install keyd config (Linux only)"
