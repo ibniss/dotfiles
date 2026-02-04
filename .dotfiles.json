@@ -56,6 +56,15 @@
       "platforms": [
         "macos"
       ]
+    },
+    "karabiner": {
+      "type": "stow",
+      "paths": [
+        ".config/karabiner/karabiner.json"
+      ],
+      "platforms": [
+        "macos"
+      ]
     }
   },
   "dependencies": {

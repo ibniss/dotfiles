@@ -14,7 +14,7 @@ default:
     @just --list
 
 # Install all dotfiles using stow
-install: _install-all-stow _install-keyd-if-linux _install-aerospace-if-macos
+install: _install-all-stow _install-keyd-if-linux _install-aerospace-if-macos _install-karabiner-if-macos
     @echo "✅ All dotfiles installed successfully!"
     @echo "ℹ️  Restart your shell"
 
@@ -100,6 +100,25 @@ uninstall-aerospace:
 [private]
 _install-aerospace-if-macos:
     @if [ "{{os()}}" = "macos" ]; then just install-aerospace; fi
+
+# Special: Install karabiner (macOS only, keyboard customizer)
+install-karabiner:
+    @if [ "{{os()}}" != "macos" ]; then \
+        echo "⚠️  karabiner is only available on macOS"; \
+        exit 0; \
+    fi
+    @just _stow karabiner
+
+uninstall-karabiner:
+    @if [ "{{os()}}" != "macos" ]; then \
+        echo "⚠️  karabiner is only available on macOS"; \
+        exit 0; \
+    fi
+    @just _unstow karabiner
+
+[private]
+_install-karabiner-if-macos:
+    @if [ "{{os()}}" = "macos" ]; then just install-karabiner; fi
 
 # Show installation status
 status:
@@ -236,6 +255,7 @@ help:
     @echo "  just install-git     Install git config"
     @echo "  just install-keyd    Install keyd config (Linux only)"
     @echo "  just install-aerospace Install aerospace config (macOS only)"
+    @echo "  just install-karabiner Install karabiner config (macOS only)"
     @echo ""
     @echo "Stow packages: {{stow_packages}}"
     @echo ""
