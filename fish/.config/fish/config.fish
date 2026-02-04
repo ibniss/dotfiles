@@ -26,3 +26,10 @@ set -gx MANPAGER 'nvim +Man!'
 
 # opencode
 fish_add_path /Users/kbiel/.opencode/bin
+
+# -----------------------------------------------------------------------------
+# Local Environment (not committed)
+# -----------------------------------------------------------------------------
+if test -f "$HOME/.env.local"
+    export (grep -v '^#' "$HOME/.env.local" | xargs)
+end
