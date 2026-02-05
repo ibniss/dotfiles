@@ -70,10 +70,10 @@ automatically-unhide-macos-hidden-apps = false
     3 = 'main'
     4 = 'main'
     5 = 'main'
-    6 = '^built-in retina display$'
-    7 = '^built-in retina display$'
-    8 = '^built-in retina display$'
-    9 = '^built-in retina display$'
+    6 = ['^built-in retina display$', 'secondary']
+    7 = ['^built-in retina display$', 'secondary']
+    8 = ['^built-in retina display$', 'secondary']
+    9 = ['^built-in retina display$', 'secondary']
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
