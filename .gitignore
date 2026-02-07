@@ -4,3 +4,5 @@
 .DS_Store
 # variables is generated and varies a lot
 fish/.config/fish/fish_variables
+# karabiner auto-generates dated backups
+karabiner/.config/karabiner/automatic_backups/

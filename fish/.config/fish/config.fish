@@ -25,7 +25,7 @@ set -gx VISUAL "nvim"
 set -gx MANPAGER 'nvim +Man!'
 
 # opencode
-fish_add_path /Users/kbiel/.opencode/bin
+fish_add_path "$HOME/.opencode/bin"
 
 # -----------------------------------------------------------------------------
 # Local Environment (not committed)

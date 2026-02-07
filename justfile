@@ -65,17 +65,34 @@ uninstall-mise: (_unstow "mise")
 uninstall-opencode: (_unstow "opencode")
 uninstall-git: (_unstow "git")
 
+# Install a "special" package by reading its install command from .dotfiles.json
+[private]
+_install-special package:
+    #!/usr/bin/env bash
+    platform=$(jq -r --arg pkg "{{package}}" '.packages[$pkg].platforms // [] | join(",")' {{config_file}})
+    current_os="{{os()}}"
+    if [ -n "$platform" ] && [[ ! "$platform" =~ "$current_os" ]]; then
+        echo "⚠️  {{package}} is not available on $current_os"
+        exit 0
+    fi
+    install_cmd=$(jq -r --arg pkg "{{package}}" '.packages[$pkg].install // empty' {{config_file}})
+    if [ -z "$install_cmd" ]; then
+        echo "❌ No install command found for {{package}}"
+        exit 1
+    fi
+    echo "📦 Installing {{package}} (special)..."
+    eval "$install_cmd"
+    echo "✅ {{package}} installed"
+
 # Special: Install keyd (Linux only, uses cp not stow)
 install-keyd:
     @if [ "{{os()}}" != "linux" ]; then \
         echo "⚠️  keyd is only available on Linux"; \
         exit 0; \
     fi
-    @echo "⌨️  Installing keyd configuration..."
     @echo "⚠️  This requires sudo privileges"
     @sudo mkdir -p /etc/keyd
-    @sudo cp {{dotfiles_dir}}/keyd/default.conf /etc/keyd/default.conf
-    @echo "✅ keyd configuration installed"
+    @just _install-special keyd
     @echo "ℹ️  Restart keyd service: sudo systemctl restart keyd"
 
 [private]

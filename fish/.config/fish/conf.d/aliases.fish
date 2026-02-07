@@ -9,4 +9,3 @@ alias ... "cd ../.."
 alias .... "cd ../../.."
 alias ..... "cd ../../../.."
 
-alias zshconfig "nvim ~/.zshrc"
