@@ -116,7 +116,7 @@ return {
         "rust-analyzer",
         "basedpyright",
         "eslint-lsp",
-        "gopls",
+        -- "gopls",
         "vtsls",
         "clangd",
         "json-lsp",
