@@ -10,6 +10,8 @@ return {
         "javascript",
         "typescript",
         "tsx",
+        "typescriptreact",
+        "javascriptreact",
         "python",
         "rust",
         "c",
