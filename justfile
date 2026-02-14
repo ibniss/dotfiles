@@ -43,12 +43,12 @@ _unstow package:
 # Install all stow packages
 [private]
 _install-all-stow:
-    @for pkg in {{stow_packages}}; do just _stow $pkg; done
+    @for pkg in {{stow_packages}}; do just install-$pkg; done
 
 # Uninstall all stow packages
 [private]
 _uninstall-all-stow:
-    @for pkg in {{stow_packages}}; do just _unstow $pkg; done
+    @for pkg in {{stow_packages}}; do just uninstall-$pkg; done
 
 # Install/uninstall recipes for each package
 install-nvim: (_stow "nvim")
@@ -56,13 +56,29 @@ install-wezterm: (_stow "wezterm")
 install-fish: (_stow "fish")
 install-mise: (_stow "mise")
 install-opencode: (_stow "opencode")
+install-agents: (_stow "agents")
 install-git: (_stow "git")
+install-codex:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    codex_dir="{{home_dir}}/.codex"
+    mkdir -p "$codex_dir"
+    ts="$(date +%Y%m%d%H%M%S)"
+    for path in "$codex_dir/config.toml" "$codex_dir/AGENTS.md"; do
+        if [ -e "$path" ] && [ ! -L "$path" ]; then
+            mv "$path" "$path.bak.$ts"
+            echo "📦 Backed up existing $path to $path.bak.$ts"
+        fi
+    done
+    just _stow codex
 
 uninstall-nvim: (_unstow "nvim")
 uninstall-wezterm: (_unstow "wezterm")
 uninstall-fish: (_unstow "fish")
 uninstall-mise: (_unstow "mise")
 uninstall-opencode: (_unstow "opencode")
+uninstall-codex: (_unstow "codex")
+uninstall-agents: (_unstow "agents")
 uninstall-git: (_unstow "git")
 
 # Install a "special" package by reading its install command from .dotfiles.json

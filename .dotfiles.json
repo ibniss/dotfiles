@@ -25,10 +25,23 @@
         ".config/mise/config.toml"
       ]
     },
-"opencode": {
+    "opencode": {
       "type": "stow",
       "paths": [
         ".config/opencode/config.json"
+      ]
+    },
+    "codex": {
+      "type": "stow",
+      "paths": [
+        ".codex/config.toml",
+        ".codex/AGENTS.md"
+      ]
+    },
+    "agents": {
+      "type": "stow",
+      "paths": [
+        ".agents/skills"
       ]
     },
     "git": {
