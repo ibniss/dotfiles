@@ -5,13 +5,11 @@ return {
     branch = "main",
     build = ":TSUpdate",
     config = function()
-      local filetypes = {
+      local parsers = {
         "diff",
         "javascript",
         "typescript",
         "tsx",
-        "typescriptreact",
-        "javascriptreact",
         "python",
         "rust",
         "c",
@@ -26,21 +24,29 @@ return {
         "bash",
         "markdown",
         "markdown_inline",
+        "yaml",
       }
 
       -- Install parsers using native API
-      require("nvim-treesitter").install(filetypes)
+      require("nvim-treesitter").install(parsers)
+
+      local filetype_map = {}
+      for _, parser in ipairs(parsers) do
+        for _, filetype in ipairs(vim.treesitter.language.get_filetypes(parser)) do
+          filetype_map[filetype] = true
+        end
+      end
 
       -- Enable highlighting via native API
       vim.api.nvim_create_autocmd("FileType", {
-        pattern = filetypes,
-        callback = function() vim.treesitter.start() end,
+        pattern = vim.tbl_keys(filetype_map),
+        callback = function(args) vim.treesitter.start(args.buf) end,
       })
 
       -- Handle mdx -> markdown parser
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "mdx",
-        callback = function() vim.treesitter.start(0, "markdown") end,
+        callback = function(args) vim.treesitter.start(args.buf, "markdown") end,
       })
     end,
   },
