@@ -36,11 +36,11 @@ return {
             return { "isort", "blue" }
           end
         end,
-        javascript = { "prettier" },
-        typescript = { "prettier" },
-        javascriptreact = { "prettier" },
-        typescriptreact = { "prettier" },
-        json = { "prettier" },
+        javascript = { "oxfmt" },
+        typescript = { "oxfmt" },
+        javascriptreact = { "oxfmt" },
+        typescriptreact = { "oxfmt" },
+        json = { "oxfmt" },
         ocaml = { "ocamlformat" },
         ocaml_mlx = { "ocamlformat_mlx" },
       },

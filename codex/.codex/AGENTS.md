@@ -12,6 +12,7 @@
   - Python: no `# type: ignore`, no `cast`.
 - Make illegal states unrepresentable where practical (discriminated unions/ADTs, parse at boundaries).
 - Keep abstractions intentionally narrow and documented.
+- No backward compatibility by default. No shims, no legacy fallbacks, no dual-path support. Only add compat when explicitly requested.
 
 ## Testing
 
