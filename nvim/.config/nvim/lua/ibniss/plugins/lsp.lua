@@ -32,48 +32,48 @@ return {
       { "stevearc/conform.nvim" },
     },
     config = function()
-      local vtsls_inlay_hints = {
-        enumMemberValues = { enabled = true },
-        functionLikeReturnTypes = { enabled = true },
-        functionParameterTypes = { enabled = true },
-        parameterNames = { enabled = "all" },
-        parameterNameWhenArgumentMatchesNames = { enabled = true },
-        propertyDeclarationTypes = { enabled = true },
-        variableTypes = { enabled = true },
-        variableTypeWhenTypeMatchesNames = { enabled = true },
-      }
+      -- local vtsls_inlay_hints = {
+      --   enumMemberValues = { enabled = true },
+      --   functionLikeReturnTypes = { enabled = true },
+      --   functionParameterTypes = { enabled = true },
+      --   parameterNames = { enabled = "all" },
+      --   parameterNameWhenArgumentMatchesNames = { enabled = true },
+      --   propertyDeclarationTypes = { enabled = true },
+      --   variableTypes = { enabled = true },
+      --   variableTypeWhenTypeMatchesNames = { enabled = true },
+      -- }
 
       -- Server configurations
       -- true means default configuration (uses nvim-lspconfig's lsp/ directory)
       -- table means custom overrides merged with nvim-lspconfig defaults
       local servers = {
         lua_ls = true,
-        vtsls = {
-          settings = {
-            complete_function_calls = true,
-            vtsls = {
-              autoUseWorkspaceTsdk = true,
-              experimental = {
-                completion = {
-                  enableServerSideFuzzyMatch = true,
-                },
-              },
-            },
-            typescript = {
-              updateImportOnFileMove = { enabled = "always" },
-              suggest = {
-                completeFunctionCalls = true,
-              },
-              tsserver = {
-                maxTsServerMemory = 9216,
-              },
-              inlayHints = vtsls_inlay_hints,
-            },
-            javascript = {
-              inlayHints = vtsls_inlay_hints,
-            },
-          },
-        },
+        -- vtsls = {
+        --   settings = {
+        --     complete_function_calls = true,
+        --     vtsls = {
+        --       autoUseWorkspaceTsdk = true,
+        --       experimental = {
+        --         completion = {
+        --           enableServerSideFuzzyMatch = true,
+        --         },
+        --       },
+        --     },
+        --     typescript = {
+        --       updateImportOnFileMove = { enabled = "always" },
+        --       suggest = {
+        --         completeFunctionCalls = true,
+        --       },
+        --       tsserver = {
+        --         maxTsServerMemory = 9216,
+        --       },
+        --       inlayHints = vtsls_inlay_hints,
+        --     },
+        --     javascript = {
+        --       inlayHints = vtsls_inlay_hints,
+        --     },
+        --   },
+        -- },
         gopls = {
           settings = {
             gopls = {
@@ -91,7 +91,8 @@ return {
         },
         clangd = true,
         rust_analyzer = true,
-        basedpyright = true,
+        -- basedpyright = true,
+        ty = true,
         eslint = true,
         jsonls = true,
         ocamllsp = {
@@ -114,10 +115,11 @@ return {
       local ensure_installed = {
         "lua-language-server",
         "rust-analyzer",
-        "basedpyright",
+        -- "basedpyright",
+        "ty",
         "eslint-lsp",
         -- "gopls",
-        "vtsls",
+        -- "vtsls",
         "clangd",
         "json-lsp",
       }
@@ -212,7 +214,7 @@ return {
           end
 
           -- Server-specific on_attach: twoslash-queries for vtsls
-          if client.name == "vtsls" then require("twoslash-queries").attach(client, bufnr) end
+          -- if client.name == "vtsls" then require("twoslash-queries").attach(client, bufnr) end
         end,
       })
 

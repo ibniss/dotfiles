@@ -1,6 +1,12 @@
 {
   "$schema": "./dotfiles.schema.json",
   "packages": {
+    "bin": {
+      "type": "stow",
+      "paths": [
+        ".local/bin/codex-sync-mise-local"
+      ]
+    },
     "nvim": {
       "type": "stow",
       "paths": [

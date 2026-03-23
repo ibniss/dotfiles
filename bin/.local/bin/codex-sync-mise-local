@@ -1,0 +1,166 @@
+#!/usr/bin/env -S fish --no-config
+
+function usage
+    printf '%s\n' \
+        'Usage: codex-sync-mise-local [--dry-run] [--force] [--verbose] [--source PATH]' \
+        '' \
+        'Copy gitignored mise.local.toml files into the current checkout.' \
+        '' \
+        'By default, the source is the original checkout backing the current worktree,' \
+        'derived from `git rev-parse --git-common-dir`.' \
+        '' \
+        'Options:' \
+        '  --dry-run, -n       Print planned copies without modifying files' \
+        '  --force, -f         Overwrite existing different files in the current checkout' \
+        '  --verbose, -v       Print extra scanning details' \
+        '  --source PATH       Copy only from this checkout/worktree' \
+        '  --help, -h          Show this help'
+end
+
+function log --argument text
+    printf '%s\n' "$text"
+end
+
+function debug --argument text
+    if test "$verbose" -eq 1
+        log "$text"
+    end
+end
+
+function resolve_path --argument path
+    if not test -e "$path"
+        printf 'Path does not exist: %s\n' "$path" >&2
+        return 1
+    end
+
+    set -l old_pwd "$PWD"
+    cd "$path"
+    pwd -P
+    cd "$old_pwd"
+end
+
+function main_checkout_root
+    set -l common_git_dir (git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+    or return 1
+
+    if test (basename "$common_git_dir") != .git
+        printf 'Unable to infer original checkout from git common dir: %s\n' "$common_git_dir" >&2
+        return 1
+    end
+
+    resolve_path (dirname "$common_git_dir")
+end
+
+argparse 'n/dry-run' 'f/force' 'v/verbose' 's/source=' 'h/help' -- $argv
+or begin
+    usage >&2
+    exit 2
+end
+
+if set -q _flag_help
+    usage
+    exit 0
+end
+
+set -g dry_run 0
+set -g force 0
+set -g verbose 0
+
+if set -q _flag_dry_run
+    set dry_run 1
+end
+
+if set -q _flag_force
+    set force 1
+end
+
+if set -q _flag_verbose
+    set verbose 1
+end
+
+set -l current_root (git rev-parse --show-toplevel 2>/dev/null)
+or begin
+    log 'Not inside a git repository' >&2
+    exit 1
+end
+set current_root (resolve_path "$current_root")
+
+set -l worktrees
+if set -q _flag_source
+    set -l source_root (resolve_path "$_flag_source")
+    if test "$source_root" != "$current_root"
+        set -a worktrees "$source_root"
+    end
+else
+    set -l source_root (main_checkout_root)
+    or exit 1
+
+    if test "$source_root" != "$current_root"
+        set -a worktrees "$source_root"
+    end
+end
+
+if test (count $worktrees) -eq 0
+    log 'No source checkout found'
+    exit 0
+end
+
+set -l copied 0
+set -l skipped 0
+set -l conflicts 0
+set -l found_files 0
+
+for worktree_path in $worktrees
+    debug "Scanning $worktree_path"
+    set -l source_files (find "$worktree_path" -type f -name 'mise.local.toml' -not -path '*/.git/*' -print0 | string split0)
+
+    for source_file in $source_files
+        if test -z "$source_file"
+            continue
+        end
+
+        set found_files (math "$found_files + 1")
+        set -l rel_path (string replace "$worktree_path/" '' -- "$source_file")
+        set -l dest_file "$current_root/$rel_path"
+
+        if test -e "$dest_file"
+            if cmp -s -- "$source_file" "$dest_file"
+                debug "Already up to date: $rel_path"
+                set skipped (math "$skipped + 1")
+                continue
+            end
+
+            if test "$force" -ne 1
+                log "Skipping existing different file: $rel_path"
+                set conflicts (math "$conflicts + 1")
+                continue
+            end
+
+            set -l action overwrite
+        else
+            set -l action copy
+        end
+
+        if test "$dry_run" -eq 1
+            log "Would $action $rel_path from $worktree_path"
+        else
+            mkdir -p (dirname "$dest_file")
+            cp "$source_file" "$dest_file"
+            chmod 600 "$dest_file" 2>/dev/null
+            if test "$action" = overwrite
+                log "Overwrote $rel_path from $worktree_path"
+            else
+                log "Copied $rel_path from $worktree_path"
+            end
+        end
+
+        set copied (math "$copied + 1")
+    end
+end
+
+if test "$found_files" -eq 0
+    log 'No mise.local.toml files found in source checkout'
+    exit 0
+end
+
+log "Summary: copied=$copied skipped=$skipped conflicts=$conflicts"

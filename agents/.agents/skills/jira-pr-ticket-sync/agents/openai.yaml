@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jira PR Ticket Sync"
+  short_description: "Create Jira ticket and sync PR metadata"
+  default_prompt: "Use $jira-pr-ticket-sync to create a Jira ticket for the current PR and update the PR title/body to match the branch scope."

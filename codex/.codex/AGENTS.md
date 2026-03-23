@@ -19,6 +19,10 @@
 - Write tests that verify semantically correct behavior.
 - Failing tests are acceptable when they expose genuine bugs and represent correct expected behavior.
 
+## Worktree Setup
+
+- At the start of work in a Git repository, run `codex-sync-mise-local` once before substantial work if it is available on `PATH`.
+
 ## Git
 
 - Use `gh` CLI if needed to check CI failures, read current PR context etc
