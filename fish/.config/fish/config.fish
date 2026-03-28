@@ -28,5 +28,5 @@ fish_add_path "$HOME/.opencode/bin"
 # Local Environment (not committed)
 # -----------------------------------------------------------------------------
 if test -f "$HOME/.env.local"
-    export (grep -v '^#' "$HOME/.env.local" | xargs)
+    loadenv "$HOME/.env.local"
 end
