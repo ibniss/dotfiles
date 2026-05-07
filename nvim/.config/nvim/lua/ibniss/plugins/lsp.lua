@@ -95,6 +95,7 @@ return {
         ty = true,
         eslint = true,
         jsonls = true,
+        terraformls = true,
         ocamllsp = {
           manual_install = true,
           cmd = { "dune", "tools", "exec", "ocamllsp" },

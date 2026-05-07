@@ -1,2 +1,4 @@
 mise.local.toml
 .opencode/
+
+**/.claude/settings.local.json

@@ -1,23 +1,19 @@
-## Global Operating Style
+## Debugging
 
-- Prefer the simplest solution that satisfies the request; call out tradeoffs briefly.
-- If a request is too broad, propose smaller slices and ask which slice to do first.
+- When debugging, don't guess and after tracing through the code if the issue isn't clear, bias towards instrumenting/logging around the issue especially if it's a quick to reproduce.
 
-## Code Quality Standards
+## Planning
 
-- If a problem can be solved in a simpler way, propose it.
-- If asked to do too much work at once, stop and state that clearly.
-- Try not to compromise type safety.
-  - TypeScript: no `any`, no non-null assertion operator (`!`), no unchecked type assertions.
-  - Python: no `# type: ignore`, no `cast`.
-- Make illegal states unrepresentable where practical (discriminated unions/ADTs, parse at boundaries).
-- Keep abstractions intentionally narrow and documented.
+- When planning features, prefer vertical slices that can be tested end-to-end and iterated on, rather than broad horizontal ones that require long phases before functionality can be verified.
+
+## Design
+
+- Make illegal states unrepresentable where practical (discriminated unions/ADTs etc). Model data using the most precise data structure you reasonably can. If ruling out a particular possibility is too hard using the encoding you are currently using, consider alternate encodings that can express the property you care about more easily. Don’t be afraid to refactor.
+- Parse, don't validate. Push the burden of proof upward as far as possible, but no further. Get your data into the most precise representation you need as quickly as you can. Ideally, this should happen at the boundary of your system, before any of the data is acted upon. If one particular code branch eventually requires a more precise representation of a piece of data, parse the data into the more precise representation as soon as the branch is selected. Use sum types judiciously to allow your datatypes to reflect and adapt to control flow. 
+- Write functions on the data representation you wish you had, not the data representation you are given. 
+- Don’t be afraid to parse data in multiple passes. Avoiding shotgun parsing just means you shouldn’t act on the input data before it’s fully parsed, not that you can’t use some of the input data to decide how to parse other input data.
+- Prefer deep modules with narrow interfaces over many shallow layers of abstractions. Avoid shallow pass-through one-liner wrappers.
 - No backward compatibility by default. No shims, no legacy fallbacks, no dual-path support. Only add compat when explicitly requested.
-
-## Testing
-
-- Write tests that verify semantically correct behavior.
-- Failing tests are acceptable when they expose genuine bugs and represent correct expected behavior.
 
 ## Worktree Setup
 
