@@ -50,7 +50,7 @@ focus_workspace() {
 
     workspace=$(
         "$aerospace_bin" list-windows \
-            --all \
+            --monitor all \
             --app-bundle-id "$ghostty_bundle_id" \
             --format '%{workspace}' 2>/dev/null | /usr/bin/sed -n '1p'
     )

@@ -40,17 +40,15 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 # Keep Ctrl+1 pointed at the most recently focused Ghostty project workspace.
 exec-on-workspace-change = [
-    'aerospace-ghostty-workspace',
-    'remember',
+    '/bin/sh',
+    '-c',
+    'exec "$HOME/.local/bin/aerospace-ghostty-workspace" remember',
 ]
 
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
 automatically-unhide-macos-hidden-apps = false
-
-[exec.env-vars]
-    PATH = '${HOME}/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 
 # Possible values: (qwerty|dvorak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
@@ -136,7 +134,7 @@ automatically-unhide-macos-hidden-apps = false
     ctrl-equal = 'resize smart +50'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-    ctrl-1 = 'exec-and-forget aerospace-ghostty-workspace focus'
+    ctrl-1 = '''exec-and-forget /bin/sh -c 'exec "$HOME/.local/bin/aerospace-ghostty-workspace" focus' '''
     ctrl-2 = 'workspace 2'
     ctrl-3 = 'workspace 3'
     ctrl-4 = 'workspace 4'
