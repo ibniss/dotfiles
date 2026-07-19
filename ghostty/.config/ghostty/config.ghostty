@@ -7,6 +7,16 @@ window-padding-y = 10,0
 macos-titlebar-style = tabs
 macos-option-as-alt = false
 
+# Enable every available Fish shell-integration feature, including prompt
+# navigation, working-directory inheritance, and SSH compatibility.
+shell-integration-features = true
+
+# Keep recently closed tabs, splits, and windows recoverable for longer.
+undo-timeout = 15s
+
+# Put mouse selections directly on the macOS system clipboard.
+copy-on-select = clipboard
+
 # Keep the tmux-style Ctrl+A sequences used in WezTerm.
 keybind = ctrl+a>shift+quote=new_split:down
 keybind = ctrl+a>shift+digit_5=new_split:right
@@ -14,9 +24,40 @@ keybind = ctrl+a>c=new_tab
 keybind = ctrl+a>n=next_tab
 keybind = ctrl+a>p=previous_tab
 keybind = ctrl+a>x=close_surface
+keybind = ctrl+a>u=undo
+keybind = ctrl+a>shift+u=redo
 keybind = ctrl+a>z=toggle_split_zoom
 keybind = ctrl+a>d=inspector:toggle
 keybind = ctrl+a>ctrl+a=text:\x01
+
+# Enter a read-only scroll mode with Ctrl+Shift+X and temporarily prevent TUIs
+# from capturing the mouse. Scroll with j/k, half-pages with u/d, full pages
+# with Page Up/Down, and the ends with g/G. Dragging a mouse selection copies
+# it immediately; y copies explicitly and exits.
+keybind = ctrl+shift+x=toggle_readonly
+keybind = chain=toggle_mouse_reporting
+keybind = chain=activate_key_table:copy_mode
+keybind = copy_mode/k=scroll_page_lines:-3
+keybind = copy_mode/j=scroll_page_lines:3
+keybind = copy_mode/u=scroll_page_fractional:-0.5
+keybind = copy_mode/d=scroll_page_fractional:0.5
+keybind = copy_mode/g=scroll_to_top
+keybind = copy_mode/shift+g=scroll_to_bottom
+keybind = copy_mode/page_up=scroll_page_up
+keybind = copy_mode/page_down=scroll_page_down
+keybind = copy_mode/y=copy_to_clipboard:mixed
+keybind = chain=deactivate_key_table
+keybind = chain=toggle_mouse_reporting
+keybind = chain=toggle_readonly
+keybind = copy_mode/q=deactivate_key_table
+keybind = chain=toggle_mouse_reporting
+keybind = chain=toggle_readonly
+keybind = copy_mode/escape=deactivate_key_table
+keybind = chain=toggle_mouse_reporting
+keybind = chain=toggle_readonly
+keybind = copy_mode/ctrl+shift+x=deactivate_key_table
+keybind = chain=toggle_mouse_reporting
+keybind = chain=toggle_readonly
 
 # Prefer a Ghostty split when one exists; otherwise pass Ctrl+H/J/K/L through
 # to the terminal application, preserving the common Neovim navigation case.
