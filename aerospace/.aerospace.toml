@@ -38,10 +38,19 @@ default-root-container-orientation = 'auto'
 # Fallback value (if you omit the key): on-focused-monitor-changed = []
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
+# Keep Ctrl+1 pointed at the most recently focused Ghostty project workspace.
+exec-on-workspace-change = [
+    'aerospace-ghostty-workspace',
+    'remember',
+]
+
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
 automatically-unhide-macos-hidden-apps = false
+
+[exec.env-vars]
+    PATH = '${HOME}/.local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}'
 
 # Possible values: (qwerty|dvorak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
@@ -65,7 +74,6 @@ automatically-unhide-macos-hidden-apps = false
     outer.right =      8
 
 [workspace-to-monitor-force-assignment]
-    1 = 'main'
     2 = 'main'
     3 = 'main'
     4 = 'main'
@@ -128,7 +136,7 @@ automatically-unhide-macos-hidden-apps = false
     ctrl-equal = 'resize smart +50'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-    ctrl-1 = 'workspace 1'
+    ctrl-1 = 'exec-and-forget aerospace-ghostty-workspace focus'
     ctrl-2 = 'workspace 2'
     ctrl-3 = 'workspace 3'
     ctrl-4 = 'workspace 4'
@@ -139,7 +147,6 @@ automatically-unhide-macos-hidden-apps = false
     alt-4 = 'workspace 9'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-    ctrl-shift-1 = 'move-node-to-workspace 1'
     ctrl-shift-2 = 'move-node-to-workspace 2'
     ctrl-shift-3 = 'move-node-to-workspace 3'
     ctrl-shift-4 = 'move-node-to-workspace 4'
@@ -179,10 +186,11 @@ automatically-unhide-macos-hidden-apps = false
 
 # Default assignments - main monitor
 
-# 1 - Terminal
+# Ghostty's native macOS tabs appear as separate windows to AeroSpace. Keeping
+# them floating prevents hidden tabs from consuming tiling slots.
 [[on-window-detected]]
-    if.app-id = 'com.github.wez.wezterm'
-    run = 'move-node-to-workspace 1'
+    if.app-id = 'com.mitchellh.ghostty'
+    run = 'layout floating'
 
 # 2 - Browser
 [[on-window-detected]]
@@ -205,4 +213,3 @@ automatically-unhide-macos-hidden-apps = false
 [[on-window-detected]]
     if.app-id = 'com.tinyspeck.slackmacgap'
     run = 'move-node-to-workspace 6'
-

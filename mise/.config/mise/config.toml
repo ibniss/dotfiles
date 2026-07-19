@@ -2,7 +2,7 @@
 bun = "latest"
 go = "1.24.2"
 node = "24"
-pnpm = "10"
+pnpm = "latest"
 python = "3.11"
 usage = "latest"
 uv = "latest"

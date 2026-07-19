@@ -1,0 +1,71 @@
+#!/bin/sh
+
+set -eu
+
+aerospace_bin=/opt/homebrew/bin/aerospace
+ghostty_bundle_id=com.mitchellh.ghostty
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/aerospace"
+state_file="$state_dir/last-ghostty-workspace"
+
+# Report whether the named workspace still contains a Ghostty window.
+is_ghostty_workspace() {
+    workspace=$1
+    [ -n "$workspace" ] || return 1
+
+    window_count=$(
+        "$aerospace_bin" list-windows \
+            --workspace "$workspace" \
+            --app-bundle-id "$ghostty_bundle_id" \
+            --count 2>/dev/null || printf '0'
+    )
+    case "$window_count" in
+        '' | *[!0-9]*) return 1 ;;
+    esac
+    [ "$window_count" -gt 0 ]
+}
+
+# Remember the focused workspace when AeroSpace reports a workspace change.
+remember_workspace() {
+    workspace=${AEROSPACE_FOCUSED_WORKSPACE:-}
+    is_ghostty_workspace "$workspace" || return 0
+
+    mkdir -p "$state_dir"
+    temporary_file="$state_file.$$"
+    trap 'rm -f "$temporary_file"' EXIT HUP INT TERM
+    printf '%s\n' "$workspace" > "$temporary_file"
+    mv "$temporary_file" "$state_file"
+    trap - EXIT HUP INT TERM
+}
+
+# Focus the most recently used live Ghostty workspace, with safe fallbacks.
+focus_workspace() {
+    workspace=''
+    if [ -r "$state_file" ]; then
+        IFS= read -r workspace < "$state_file" || true
+    fi
+
+    if is_ghostty_workspace "$workspace"; then
+        exec "$aerospace_bin" workspace "$workspace"
+    fi
+
+    workspace=$(
+        "$aerospace_bin" list-windows \
+            --all \
+            --app-bundle-id "$ghostty_bundle_id" \
+            --format '%{workspace}' 2>/dev/null | /usr/bin/sed -n '1p'
+    )
+    if is_ghostty_workspace "$workspace"; then
+        exec "$aerospace_bin" workspace "$workspace"
+    fi
+
+    exit 0
+}
+
+case "${1:-}" in
+    remember) remember_workspace ;;
+    focus) focus_workspace ;;
+    *)
+        printf 'Usage: %s remember|focus\n' "$0" >&2
+        exit 2
+        ;;
+esac

@@ -19,3 +19,4 @@ function fish_mode_prompt
         echo -e "$vi_mode_color $vi_mode_symbol \x1b[0m "
     end
 end
+

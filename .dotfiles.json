@@ -19,6 +19,15 @@
         ".config/wezterm"
       ]
     },
+    "ghostty": {
+      "type": "stow",
+      "paths": [
+        ".config/ghostty/config.ghostty"
+      ],
+      "platforms": [
+        "macos"
+      ]
+    },
     "fish": {
       "type": "stow",
       "paths": [
@@ -70,7 +79,8 @@
     "aerospace": {
       "type": "stow",
       "paths": [
-        ".aerospace.toml"
+        ".aerospace.toml",
+        ".local/bin/aerospace-ghostty-workspace"
       ],
       "platforms": [
         "macos"

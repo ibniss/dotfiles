@@ -53,6 +53,7 @@ _uninstall-all-stow:
 # Install/uninstall recipes for each package
 install-nvim: (_stow "nvim")
 install-wezterm: (_stow "wezterm")
+install-ghostty: (_stow "ghostty")
 install-fish: (_stow "fish")
 install-bin: (_stow "bin")
 install-mise: (_stow "mise")
@@ -75,6 +76,7 @@ install-codex:
 
 uninstall-nvim: (_unstow "nvim")
 uninstall-wezterm: (_unstow "wezterm")
+uninstall-ghostty: (_unstow "ghostty")
 uninstall-fish: (_unstow "fish")
 uninstall-bin: (_unstow "bin")
 uninstall-mise: (_unstow "mise")

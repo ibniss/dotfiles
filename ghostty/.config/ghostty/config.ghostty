@@ -1,0 +1,46 @@
+# Appearance migrated from WezTerm.
+theme = light:TokyoNight Day,dark:TokyoNight Moon
+font-size = 18
+adjust-cell-height = 25%
+window-padding-x = 0
+window-padding-y = 10,0
+macos-titlebar-style = tabs
+macos-option-as-alt = false
+
+# Keep the tmux-style Ctrl+A sequences used in WezTerm.
+keybind = ctrl+a>shift+quote=new_split:down
+keybind = ctrl+a>shift+digit_5=new_split:right
+keybind = ctrl+a>c=new_tab
+keybind = ctrl+a>n=next_tab
+keybind = ctrl+a>p=previous_tab
+keybind = ctrl+a>x=close_surface
+keybind = ctrl+a>z=toggle_split_zoom
+keybind = ctrl+a>d=inspector:toggle
+keybind = ctrl+a>ctrl+a=text:\x01
+
+# Prefer a Ghostty split when one exists; otherwise pass Ctrl+H/J/K/L through
+# to the terminal application, preserving the common Neovim navigation case.
+keybind = performable:ctrl+h=goto_split:left
+keybind = performable:ctrl+j=goto_split:down
+keybind = performable:ctrl+k=goto_split:up
+keybind = performable:ctrl+l=goto_split:right
+
+# Resize Ghostty splits using the existing leader-plus-arrow sequences.
+keybind = performable:ctrl+a>arrow_left=resize_split:left,3
+keybind = performable:ctrl+a>arrow_down=resize_split:down,3
+keybind = performable:ctrl+a>arrow_up=resize_split:up,3
+keybind = performable:ctrl+a>arrow_right=resize_split:right,3
+
+# Jump directly to tabs 1 through 9.
+keybind = ctrl+a>1=goto_tab:1
+keybind = ctrl+a>2=goto_tab:2
+keybind = ctrl+a>3=goto_tab:3
+keybind = ctrl+a>4=goto_tab:4
+keybind = ctrl+a>5=goto_tab:5
+keybind = ctrl+a>6=goto_tab:6
+keybind = ctrl+a>7=goto_tab:7
+keybind = ctrl+a>8=goto_tab:8
+keybind = ctrl+a>9=goto_tab:9
+
+# Workspace selection remains the Raycast command on Ctrl+Shift+F. Ghostty
+# cannot invoke external commands from a keybinding, so Ctrl+A,F is omitted.

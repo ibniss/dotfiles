@@ -11,3 +11,5 @@ karabiner/.config/karabiner/automatic_backups/
 .gitconfig.work
 git/.gitconfig.local
 git/.gitconfig.work
+raycast/ghostty-workspaces/node_modules/
+raycast/ghostty-workspaces/dist/

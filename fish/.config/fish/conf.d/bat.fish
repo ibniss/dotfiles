@@ -1,7 +1,10 @@
-if command -q bat then
-    alias cat="bat"
-    alias less="bat"
-else if command -q batcat then
-    alias cat="batcat"
-    alias less="batcat"
+if status is-interactive
+    # Keep typed cat/less convenient without shadowing the binaries for Fish code.
+    if command -q bat
+        abbr --add cat bat
+        abbr --add less bat
+    else if command -q batcat
+        abbr --add cat batcat
+        abbr --add less batcat
+    end
 end
