@@ -1,14 +1,37 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "ghostty-workspaces",
-  "title": "Ghostty Workspaces",
   "description": "Find, focus, and create project workspaces in Ghostty",
-  "icon": "ghostty.png",
-  "author": "kbiel",
-  "platforms": [
-    "macOS"
-  ],
   "license": "MIT",
+  "author": "kbiel",
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "oxlint --fix . && nub run format",
+    "format": "oxfmt --write src package.json tsconfig.json oxlint.config.ts .oxfmtrc.jsonc",
+    "format-check": "oxfmt --check src package.json tsconfig.json oxlint.config.ts .oxfmtrc.jsonc",
+    "lint": "oxlint . && nub run format-check"
+  },
+  "dependencies": {
+    "@raycast/api": "^1.104.23",
+    "@raycast/utils": "^2.2.7"
+  },
+  "devDependencies": {
+    "@raycast/eslint-plugin": "^2.2.0",
+    "@types/node": "22.13.10",
+    "@types/react": "19.0.10",
+    "oxfmt": "^0.59.0",
+    "oxlint": "^1.74.0",
+    "typescript": "^7.0.2"
+  },
+  "icon": "ghostty.png",
+  "devEngines": {
+    "packageManager": {
+      "name": "nub",
+      "version": "^0.4.13",
+      "onFail": "warn"
+    }
+  },
   "commands": [
     {
       "name": "switch-workspace",
@@ -17,29 +40,8 @@
       "mode": "view"
     }
   ],
-  "scripts": {
-    "build": "ray build -e dist",
-    "dev": "ray develop",
-    "fix-lint": "ray lint --fix",
-    "lint": "ray lint"
-  },
-  "dependencies": {
-    "@raycast/api": "^1.104.23",
-    "@raycast/utils": "^2.2.7"
-  },
-  "devDependencies": {
-    "@raycast/eslint-config": "^2.1.1",
-    "@types/node": "22.13.10",
-    "@types/react": "19.0.10",
-    "eslint": "^9.39.2",
-    "prettier": "^3.7.4",
-    "typescript": "^5.9.3"
-  },
-  "devEngines": {
-    "packageManager": {
-      "name": "nub",
-      "version": "^0.4.13",
-      "onFail": "warn"
-    }
-  }
+  "platforms": [
+    "macOS"
+  ],
+  "title": "Ghostty Workspaces"
 }

@@ -66,7 +66,7 @@ export async function placeAeroSpaceWindow(windowId: number, workspace: string):
 
 async function focusAndFullscreenAeroSpaceWindow(windowId: number): Promise<void> {
   await runAeroSpace(["focus", "--window-id", windowId.toString()]);
-  await runAeroSpace(["fullscreen", "on", "--window-id", windowId.toString(), "--no-outer-gaps"]);
+  await runAeroSpace(["fullscreen", "on", "--window-id", windowId.toString()]);
 }
 
 async function listWindows(filters: readonly string[]): Promise<readonly AeroSpaceWindow[]> {

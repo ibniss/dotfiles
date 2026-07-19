@@ -6,6 +6,7 @@
     "moduleResolution": "NodeNext",
     "target": "ES2022",
     "jsx": "react-jsx",
+    "types": ["node"],
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
