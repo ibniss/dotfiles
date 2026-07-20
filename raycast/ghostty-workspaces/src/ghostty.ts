@@ -1,4 +1,6 @@
 import { runAppleScript } from "@raycast/utils";
+import { spawn } from "node:child_process";
+import { createInterface } from "node:readline";
 
 export type GhosttyTerminal = Readonly<{
   id: string;
@@ -21,33 +23,60 @@ export type GhosttyWindow = Readonly<{
 }>;
 
 export type GhosttyState = Readonly<{
-  version: string;
   windows: readonly GhosttyWindow[];
 }>;
 
 const QUERY_GHOSTTY_SCRIPT = String.raw`
-const ghostty = Application("Ghostty");
-const windows = ghostty.windows();
+ObjC.import("Foundation");
 
-JSON.stringify({
-  version: ghostty.version(),
-  windows: windows.map((window) => ({
-    id: window.id(),
-    name: window.name(),
-    tabs: window.tabs().map((tab) => ({
-      id: tab.id(),
-      name: tab.name(),
-      index: tab.index(),
-      selected: tab.selected(),
-      terminals: tab.terminals().map((terminal) => ({
-        id: terminal.id(),
-        name: terminal.name(),
-        cwd: terminal.workingDirectory() || null,
-      })),
-    })),
-  })),
-});
+function emit(value) {
+  const data = $(JSON.stringify(value) + "\n").dataUsingEncoding($.NSUTF8StringEncoding);
+  $.NSFileHandle.fileHandleWithStandardOutput.writeData(data);
+}
+
+function main() {
+  const ghostty = Application("Ghostty");
+  const windows = ghostty.windows();
+
+  windows.forEach((window) => {
+    // Fetch each object's property record in one Apple event; individual getters roughly double query time.
+    const windowProperties = window.properties();
+    const id = windowProperties.id;
+    const name = windowProperties.name;
+    const nativeTabs = window.tabs();
+    const tabs = [];
+    const emitWindow = () => emit({ kind: "window", window: { id, name, tabs } });
+
+    if (nativeTabs.length === 0) emitWindow();
+
+    nativeTabs.forEach((tab) => {
+      const tabProperties = tab.properties();
+      tabs.push({
+        id: tabProperties.id,
+        name: tabProperties.name,
+        index: tabProperties.index,
+        selected: tabProperties.selected,
+        terminals: tab.terminals().map((terminal) => {
+          const terminalProperties = terminal.properties();
+          return {
+            id: terminalProperties.id,
+            name: terminalProperties.name,
+            cwd: terminalProperties.workingDirectory || null,
+          };
+        }),
+      });
+      emitWindow();
+    });
+  });
+
+  emit({ kind: "complete" });
+}
+
+main();
 `;
+
+const OSASCRIPT_BINARY = "/usr/bin/osascript";
+const QUERY_TIMEOUT_MS = 3_000;
 
 const FOCUS_WINDOW_SCRIPT = String.raw`
 on run argv
@@ -85,14 +114,61 @@ on run argv
 end run
 `;
 
-/** Read the current native Ghostty window, tab, and terminal hierarchy. */
-export async function queryGhostty(): Promise<GhosttyState> {
-  const output = await runAppleScript(QUERY_GHOSTTY_SCRIPT, {
-    language: "JavaScript",
-    timeout: 3_000,
+/** Read Ghostty's hierarchy, reporting each fully hydrated window as soon as it is available. */
+export async function queryGhostty(onProgress?: (windows: readonly GhosttyWindow[]) => void): Promise<GhosttyState> {
+  const child = spawn(OSASCRIPT_BINARY, ["-l", "JavaScript", "-e", QUERY_GHOSTTY_SCRIPT], {
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  const completion = waitForProcess(child);
+  const lines = createInterface({ input: child.stdout, crlfDelay: Infinity });
+  const windows: GhosttyWindow[] = [];
+  let stderr = "";
+  let complete = false;
+  let timedOut = false;
+
+  child.stderr.setEncoding("utf8");
+  child.stderr.on("data", (chunk: string) => {
+    stderr += chunk;
   });
 
-  return parseGhosttyState(JSON.parse(output) as unknown);
+  const timeout = setTimeout(() => {
+    timedOut = true;
+    child.kill();
+  }, QUERY_TIMEOUT_MS);
+
+  try {
+    for await (const line of lines) {
+      if (line.length === 0) continue;
+
+      const event = parseQueryEvent(JSON.parse(line) as unknown);
+      if (event.kind === "complete") {
+        complete = true;
+        continue;
+      }
+
+      const existingIndex = windows.findIndex((window) => window.id === event.window.id);
+      if (existingIndex === -1) windows.push(event.window);
+      else windows[existingIndex] = event.window;
+      onProgress?.([...windows]);
+    }
+
+    const exitCode = await completion;
+    if (timedOut) throw new Error(`Ghostty query timed out after ${QUERY_TIMEOUT_MS} ms`);
+    if (exitCode !== 0) throw new Error(stderr.trim() || `Ghostty query exited with status ${exitCode}`);
+    if (!complete) throw new Error("Ghostty query ended before reporting completion");
+
+    return { windows };
+  } finally {
+    clearTimeout(timeout);
+    lines.close();
+    if (child.exitCode === null) child.kill();
+  }
+}
+
+/** Parse a persisted Ghostty hierarchy at the cache boundary. */
+export function parseGhosttyState(value: unknown): GhosttyState {
+  const record = parseRecord(value, "Ghostty state");
+  return { windows: parseArray(record.windows, "Ghostty windows").map(parseWindow) };
 }
 
 /** Bring an existing Ghostty window and its focused terminal to the foreground. */
@@ -105,12 +181,14 @@ export async function createGhosttyWindow(projectDirectory: string): Promise<str
   return runAppleScript(CREATE_WINDOW_SCRIPT, [projectDirectory], { timeout: 5_000 });
 }
 
-function parseGhosttyState(value: unknown): GhosttyState {
-  const record = parseRecord(value, "Ghostty state");
-  return {
-    version: parseString(record.version, "Ghostty version"),
-    windows: parseArray(record.windows, "Ghostty windows").map(parseWindow),
-  };
+type QueryEvent = Readonly<{ kind: "window"; window: GhosttyWindow }> | Readonly<{ kind: "complete" }>;
+
+function parseQueryEvent(value: unknown): QueryEvent {
+  const record = parseRecord(value, "Ghostty query event");
+  const kind = parseString(record.kind, "Ghostty query event kind");
+  if (kind === "window") return { kind, window: parseWindow(record.window) };
+  if (kind === "complete") return { kind };
+  throw new Error(`Unknown Ghostty query event: ${kind}`);
 }
 
 function parseWindow(value: unknown): GhosttyWindow {
@@ -167,4 +245,11 @@ function parseNumber(value: unknown, label: string): number {
 function parseBoolean(value: unknown, label: string): boolean {
   if (typeof value !== "boolean") throw new Error(`${label} must be true or false`);
   return value;
+}
+
+function waitForProcess(child: ReturnType<typeof spawn>): Promise<number | null> {
+  return new Promise((resolve, reject) => {
+    child.once("error", reject);
+    child.once("close", resolve);
+  });
 }

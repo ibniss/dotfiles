@@ -1,4 +1,15 @@
-import { Action, ActionPanel, closeMainWindow, Color, Icon, Keyboard, List, showToast, Toast } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Cache,
+  closeMainWindow,
+  Color,
+  Icon,
+  Keyboard,
+  List,
+  showToast,
+  Toast,
+} from "@raycast/api";
 import { homedir } from "node:os";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -10,6 +21,7 @@ import {
 import {
   createGhosttyWindow,
   focusGhosttyWindow,
+  parseGhosttyState,
   queryGhostty,
   type GhosttyState,
   type GhosttyWindow,
@@ -24,53 +36,90 @@ import {
   type WorkspaceItem,
 } from "./workspaces";
 
-type LoadedWorkspaceState = Readonly<{
-  projects: readonly Project[];
-  ghostty: GhosttyState;
+type Loadable<T> =
+  | Readonly<{ kind: "loading"; value: T | null }>
+  | Readonly<{ kind: "loaded"; value: T }>
+  | Readonly<{ kind: "failed"; value: T | null; message: string }>;
+
+type ViewState = Readonly<{
+  projects: Loadable<readonly Project[]>;
+  ghostty: Loadable<GhosttyState>;
+  confirmedGhosttyWindowIds: ReadonlySet<string>;
 }>;
 
-type ViewState =
-  | Readonly<{ kind: "loading"; previous: LoadedWorkspaceState | null }>
-  | Readonly<{ kind: "loaded"; value: LoadedWorkspaceState }>
-  | Readonly<{ kind: "failed"; message: string }>;
+const workspaceCache = new Cache({ namespace: "switch-workspace" });
+const PROJECT_CACHE_KEY = "projects-v1";
+const GHOSTTY_CACHE_KEY = "ghostty-v1";
 
 /** Render the interactive Ghostty project and live-window picker. */
 export default function SwitchWorkspaceCommand() {
-  const [state, setState] = useState<ViewState>({ kind: "loading", previous: null });
+  const [state, setState] = useState<ViewState>(initialViewState);
 
   const reload = useCallback(async () => {
     setState((current) => ({
-      kind: "loading",
-      previous: current.kind === "loaded" ? current.value : current.kind === "loading" ? current.previous : null,
+      projects: { kind: "loading", value: current.projects.value },
+      ghostty: { kind: "loading", value: current.ghostty.value },
+      confirmedGhosttyWindowIds: new Set(),
     }));
 
-    try {
-      const [projects, ghostty] = await Promise.all([discoverProjects(), queryGhostty()]);
-      setState({ kind: "loaded", value: { projects, ghostty } });
-    } catch (error) {
-      setState({ kind: "failed", message: errorMessage(error) });
-    }
+    const projectsPromise = discoverProjects()
+      .then((projects) => {
+        cacheProjects(projects);
+        setState((current) => ({ ...current, projects: { kind: "loaded", value: projects } }));
+      })
+      .catch((error: unknown) => {
+        setState((current) => ({
+          ...current,
+          projects: { kind: "failed", value: current.projects.value, message: errorMessage(error) },
+        }));
+      });
+    const ghosttyPromise = queryGhostty((windows) => {
+      setState((current) => ({
+        ...current,
+        ghostty: {
+          kind: "loading",
+          value: { windows: mergeGhosttyWindows(windows, current.ghostty.value?.windows ?? []) },
+        },
+        confirmedGhosttyWindowIds: new Set(windows.map((window) => window.id)),
+      }));
+    })
+      .then((ghostty) => {
+        cacheGhostty(ghostty);
+        setState((current) => ({
+          ...current,
+          ghostty: { kind: "loaded", value: ghostty },
+          confirmedGhosttyWindowIds: new Set(ghostty.windows.map((window) => window.id)),
+        }));
+      })
+      .catch((error: unknown) => {
+        setState((current) => ({
+          ...current,
+          ghostty: { kind: "failed", value: current.ghostty.value, message: errorMessage(error) },
+        }));
+      });
+
+    await Promise.all([projectsPromise, ghosttyPromise]);
   }, []);
 
   useEffect(() => {
     void reload();
   }, [reload]);
 
-  const loaded = state.kind === "loaded" ? state.value : state.kind === "loading" ? state.previous : null;
-  const items = useMemo(
-    () => (loaded === null ? [] : buildWorkspaceItems(loaded.projects, loaded.ghostty.windows)),
-    [loaded],
-  );
+  const projects = state.projects.value ?? [];
+  const ghostty = state.ghostty.value;
+  const items = useMemo(() => buildWorkspaceItems(projects, ghostty?.windows ?? []), [projects, ghostty]);
   const openItems = items.filter((item) => item.kind === "open-window");
   const newItems = items.filter((item) => item.kind === "new-project");
+  const isLoading = state.projects.kind === "loading" || state.ghostty.kind === "loading";
+  const blockingFailure = failureWithoutFallback(state);
 
   return (
-    <List isLoading={state.kind === "loading"} searchBarPlaceholder="Search Ghostty workspaces and projects…" filtering>
-      {state.kind === "failed" ? (
+    <List isLoading={isLoading} searchBarPlaceholder="Search Ghostty workspaces and projects…" filtering>
+      {blockingFailure !== null ? (
         <List.EmptyView
           icon={Icon.Warning}
           title="Could not read Ghostty workspaces"
-          description={state.message}
+          description={blockingFailure}
           actions={
             <ActionPanel>
               <Action title="Try Again" icon={Icon.ArrowClockwise} onAction={reload} />
@@ -81,17 +130,22 @@ export default function SwitchWorkspaceCommand() {
 
       <List.Section title="Open Workspaces" subtitle={openItems.length.toString()}>
         {openItems.map((item) => (
-          <WorkspaceListItem key={item.window.id} item={item} reload={reload} />
+          <WorkspaceListItem
+            key={item.project?.path ?? item.window.id}
+            item={item}
+            reload={reload}
+            isConfirmed={state.confirmedGhosttyWindowIds.has(item.window.id)}
+          />
         ))}
       </List.Section>
 
       <List.Section title="Projects" subtitle={newItems.length.toString()}>
         {newItems.map((item) => (
-          <WorkspaceListItem key={item.project.path} item={item} reload={reload} />
+          <WorkspaceListItem key={item.project.path} item={item} reload={reload} isConfirmed />
         ))}
       </List.Section>
 
-      {state.kind !== "failed" && items.length === 0 && state.kind !== "loading" ? (
+      {blockingFailure === null && items.length === 0 && !isLoading ? (
         <List.EmptyView
           icon={Icon.Folder}
           title="No projects found"
@@ -102,7 +156,110 @@ export default function SwitchWorkspaceCommand() {
   );
 }
 
-function WorkspaceListItem({ item, reload }: { item: WorkspaceItem; reload: () => Promise<void> }) {
+function initialViewState(): ViewState {
+  return {
+    projects: { kind: "loading", value: readCachedProjects() },
+    ghostty: { kind: "loading", value: readCachedGhostty() },
+    confirmedGhosttyWindowIds: new Set(),
+  };
+}
+
+function failureWithoutFallback(state: ViewState): string | null {
+  if (state.projects.kind === "failed" && state.projects.value === null) return state.projects.message;
+  if (state.ghostty.kind === "failed" && state.projects.value === null) return state.ghostty.message;
+  return null;
+}
+
+function readCachedProjects(): readonly Project[] | null {
+  try {
+    const serialized = workspaceCache.get(PROJECT_CACHE_KEY);
+    if (serialized === undefined) return null;
+
+    const projects = parseCachedProjects(JSON.parse(serialized) as unknown);
+    if (projects !== null) return projects;
+
+    removeCachedProjects();
+    return null;
+  } catch {
+    removeCachedProjects();
+    return null;
+  }
+}
+
+function cacheProjects(projects: readonly Project[]): void {
+  try {
+    workspaceCache.set(PROJECT_CACHE_KEY, JSON.stringify(projects));
+  } catch {
+    // The cache is only a launch optimization; discovery remains authoritative.
+  }
+}
+
+function removeCachedProjects(): void {
+  try {
+    workspaceCache.remove(PROJECT_CACHE_KEY);
+  } catch {
+    // An unreadable cache should never prevent the picker from opening.
+  }
+}
+
+function readCachedGhostty(): GhosttyState | null {
+  try {
+    const serialized = workspaceCache.get(GHOSTTY_CACHE_KEY);
+    if (serialized === undefined) return null;
+    return parseGhosttyState(JSON.parse(serialized) as unknown);
+  } catch {
+    removeCachedGhostty();
+    return null;
+  }
+}
+
+function cacheGhostty(ghostty: GhosttyState): void {
+  try {
+    workspaceCache.set(GHOSTTY_CACHE_KEY, JSON.stringify(ghostty));
+  } catch {
+    // The cache is only a launch optimization; the live stream remains authoritative.
+  }
+}
+
+function removeCachedGhostty(): void {
+  try {
+    workspaceCache.remove(GHOSTTY_CACHE_KEY);
+  } catch {
+    // An unreadable cache should never prevent the picker from opening.
+  }
+}
+
+function mergeGhosttyWindows(
+  fresh: readonly GhosttyWindow[],
+  fallback: readonly GhosttyWindow[],
+): readonly GhosttyWindow[] {
+  const freshIds = new Set(fresh.map((window) => window.id));
+  return [...fresh, ...fallback.filter((window) => !freshIds.has(window.id))];
+}
+
+function parseCachedProjects(value: unknown): readonly Project[] | null {
+  if (!Array.isArray(value)) return null;
+
+  const projects: Project[] = [];
+  for (const item of value) {
+    if (typeof item !== "object" || item === null || Array.isArray(item)) return null;
+
+    const record = item as Record<string, unknown>;
+    if (typeof record.name !== "string" || typeof record.path !== "string") return null;
+    projects.push({ name: record.name, path: record.path });
+  }
+  return projects;
+}
+
+function WorkspaceListItem({
+  item,
+  reload,
+  isConfirmed,
+}: {
+  item: WorkspaceItem;
+  reload: () => Promise<void>;
+  isConfirmed: boolean;
+}) {
   if (item.kind === "new-project") {
     return (
       <List.Item
@@ -127,15 +284,17 @@ function WorkspaceListItem({ item, reload }: { item: WorkspaceItem; reload: () =
 
   return (
     <List.Item
-      icon={{ source: Icon.Terminal, tintColor: Color.Green }}
+      icon={{ source: Icon.Terminal, tintColor: isConfirmed ? Color.Green : Color.SecondaryText }}
       title={title}
       subtitle={subtitleParts.join(" · ")}
       keywords={[...workspaceKeywords(item)]}
       accessories={[
-        { tag: { value: "open", color: Color.Green } },
+        {
+          tag: { value: "open", color: isConfirmed ? Color.Green : Color.SecondaryText },
+        },
         { text: `${tabCount} ${tabCount === 1 ? "tab" : "tabs"} · ${paneCount} ${paneCount === 1 ? "pane" : "panes"}` },
       ]}
-      actions={<WorkspaceActions item={item} reload={reload} />}
+      actions={isConfirmed ? <WorkspaceActions item={item} reload={reload} /> : null}
     />
   );
 }

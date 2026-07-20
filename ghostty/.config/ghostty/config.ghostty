@@ -2,8 +2,8 @@
 theme = light:TokyoNight Day,dark:TokyoNight Moon
 font-size = 18
 adjust-cell-height = 25%
-window-padding-x = 0
-window-padding-y = 10,0
+# window-padding-x = 0
+# window-padding-y = 10,0
 macos-titlebar-style = tabs
 macos-option-as-alt = false
 
